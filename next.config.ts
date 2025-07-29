@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [],
   },
+  experimental: {
+    globalNotFound: true,
+  },
 };
 
 export default nextConfig;
