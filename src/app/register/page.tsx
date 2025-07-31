@@ -1,11 +1,17 @@
-"use client";
+import dynamic from "next/dynamic";
 
-export default function Register() {
+{
+  /* Dynamic Imports */
+}
+const LoginFormComponent = dynamic(() => import("@/app/register/ui/form"));
+const LoginBackgroundComponent = dynamic(
+  () => import("@/app/register/ui/background")
+);
+
+export default function Login() {
   return (
-    <div className="h-dvh w-full flex bg-[#f9f9f9] place-content-center place-items-center font-[family-name:var(--font-geist-sans)]">
-      <form className="rounded-xl min-w-[450px]  drop-shadow-xl bg-white h-[55%]">
-        <h1 className="font-bold">LOGIN</h1>
-      </form>
-    </div>
+    <LoginBackgroundComponent>
+      <LoginFormComponent></LoginFormComponent>
+    </LoginBackgroundComponent>
   );
 }
