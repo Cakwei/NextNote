@@ -1,6 +1,6 @@
 "use client";
 
-import { Colors } from "@/constants/constants";
+import { apiEndpoint, Colors } from "@/constants/constants";
 import { appleFont } from "../../layout";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -38,15 +38,18 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
   async function login(e: FormEvent) {
     try {
       e.preventDefault();
-      const results = await axios.post(`api/login`, {
+      setProcessing(true);
+      const results = await axios.post(apiEndpoint.login, {
         email: formData.email,
         password: formData.password,
       });
       if (results) {
         console.log(results);
       }
+      setProcessing(false);
     } catch (e) {
       console.error(e);
+      setProcessing(false);
     }
   }
 
@@ -57,11 +60,6 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
       ...prev,
       [name]: value,
     }));
-  }
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setProcessing(!processing);
   }
 
   return (

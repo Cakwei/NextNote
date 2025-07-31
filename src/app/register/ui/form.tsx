@@ -1,6 +1,6 @@
 "use client";
 
-import { Colors } from "@/constants/constants";
+import { apiEndpoint, Colors } from "@/constants/constants";
 import { appleFont } from "../../layout";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -44,7 +44,7 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
   async function register(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      const results = await axios.post(`api/register`, {
+      const results = await axios.post(apiEndpoint.register, {
         email: formData.email,
         password: formData.password,
       });
