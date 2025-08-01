@@ -1,0 +1,293 @@
+/* Custom styles to fix issues with the default prose typography */
+
+/* Ensure table borders are visible */
+.bordered-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bordered-table-container th,
+.bordered-table-container td {
+  border: 1px solid #d1d5db; /* Tailwind gray-300 */
+  padding: 8px;
+}
+
+/* Fix for justified text with higher specificity */
+.bordered-table-container .ProseMirror p[style*="text-align: justify"] {
+  text-align: justify !important;
+}
+
+/* Fix for list bullets and numbers */
+.bordered-table-container ul,
+.bordered-table-container ol {
+  padding-left: 1.5rem; /* Add padding to make space for the markers */
+}
+
+.bordered-table-container ul li,
+.bordered-table-container ol li {
+  list-style-position: outside;
+}
+
+/* Fix for bullet lists */
+.bordered-table-container ul {
+  list-style-type: disc;
+}
+
+/* Fix for ordered lists */
+.bordered-table-container ol {
+  list-style-type: decimal;
+}
+
+/* Styling for hyperlinks */
+.bordered-table-container a {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+/* Custom Font Family Classes */
+.bordered-table-container .font-sans-serif {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.bordered-table-container .font-serif {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+.bordered-table-container .font-monospace {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.bordered-table-container .font-Arial {
+  font-family: Arial, sans-serif;
+}
+
+.bordered-table-container .font-Verdana {
+  font-family: Verdana, sans-serif;
+}
+
+.bordered-table-container .font-Times-New-Roman {
+  font-family: "Times New Roman", serif;
+}
+
+.bordered-table-container .font-Georgia {
+  font-family: Georgia, serif;
+}
+
+.bordered-table-container .font-Courier-New {
+  font-family: "Courier New", monospace;
+}
+
+.bordered-table-container .font-Lucida-Console {
+  font-family: "Lucida Console", monospace;
+}
+
+.bordered-table-container .font-Impact {
+  font-family: Impact, sans-serif;
+}
+
+.bordered-table-container .font-Comic-Sans-MS {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+.bordered-table-container .font-Trebuchet-MS {
+  font-family: "Trebuchet MS", sans-serif;
+}
+
+.bordered-table-container .font-Cursive {
+  font-family: cursive;
+}
+
+.bordered-table-container .font-Fantasy {
+  font-family: fantasy;
+}
+
+.bordered-table-container .font-System-UI {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.bordered-table-container .font-Inter {
+  font-family: Inter, sans-serif;
+}
+
+.bordered-table-container .font-Roboto {
+  font-family: Roboto, sans-serif;
+}
+
+.bordered-table-container .font-Open-Sans {
+  font-family: "Open Sans", sans-serif;
+}
+
+.bordered-table-container .font-Lato {
+  font-family: Lato, sans-serif;
+}
+
+.bordered-table-container .font-Montserrat {
+  font-family: Montserrat, sans-serif;
+}
+/*
+ * This file contains custom styles for the TipTap editor.
+ * It's crucial for the visual appearance and functionality of the editor components.
+ */
+
+/* ================================== */
+/* General Editor and ProseMirror Styling */
+/* ================================== */
+
+/* Main editor container */
+.ProseMirror {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  outline: none;
+}
+
+/* Base styles for all content */
+.ProseMirror p {
+  margin-bottom: 1em;
+}
+
+/* Placeholder for empty editor */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* ================================== */
+/* Custom Selection and Highlighting */
+/* ================================== */
+
+/* Text Selection - Applies to all text nodes */
+.ProseMirror ::selection {
+  background-color: #a3d9ff; /* A bright, visible blue */
+  color: #000;
+}
+.ProseMirror ::-moz-selection {
+  background-color: #a3d9ff;
+  color: #000;
+}
+
+/*
+ * Table Cell Selection
+ *
+ * Tiptap/ProseMirror uses the .ProseMirror-selectednode class for selected nodes.
+ * When multiple cells are selected, it applies this class to each individual cell.
+ * We're targeting this class to add a visible highlight.
+ */
+.ProseMirror .ProseMirror-selectednode,
+.ProseMirror .tableWrapper .ProseMirror-selectednode {
+  outline: 2px solid #3b82f6; /* A clear blue border */
+  background-color: rgba(59, 130, 246, 0.2); /* A semi-transparent blue overlay */
+  border-radius: 2px;
+}
+
+/* ================================== */
+/* Custom Node Styling */
+/* ================================== */
+
+/* Font size styling */
+span[data-font-size] {
+  font-size: var(--font-size);
+}
+
+/* Font family styling */
+span[data-font-family] {
+  font-family: var(--font-family);
+}
+
+/* Text color styling */
+span[data-color] {
+  color: var(--color);
+}
+
+/* Image styling */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  cursor: pointer;
+}
+
+/* Table styling */
+.bordered-table-container {
+  overflow-x: auto;
+}
+
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  table-layout: fixed;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  min-width: 50px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.ProseMirror th {
+  font-weight: bold;
+  text-align: left;
+  background-color: #f1f5f9;
+}
+
+/* Tiptap table resizing styles */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+.column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #a3d9ff;
+  pointer-events: none;
+}
+
+/* Task list styling */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul[data-type="taskList"] li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-right: 0.5em;
+}
+
+ul[data-type="taskList"] li > div {
+  flex-grow: 1;
+}
+
+/* Link styling */
+.ProseMirror a {
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Ensure editor is fill-height */
+.h-full {
+  height: 100%;
+}

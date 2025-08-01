@@ -1,7 +1,19 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("../../public/fonts/sf-pro-display-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.sf-pro-display {
+  font-family: "SF Pro Display", sans-serif;
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

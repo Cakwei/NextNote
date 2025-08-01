@@ -1,7 +1,7 @@
 "use client";
 
 import { apiEndpoint, Colors } from "@/constants/constants";
-import { appleFont } from "../../layout";
+import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import dynamic from "next/dynamic";
@@ -95,7 +95,7 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
               loop
               muted
               playsInline
-              className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px] "
+              className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px]"
             >
               <source src="/Login.mp4" />
               <track

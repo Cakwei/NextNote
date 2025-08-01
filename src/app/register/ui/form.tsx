@@ -1,7 +1,7 @@
 "use client";
 
 import { apiEndpoint, Colors } from "@/constants/constants";
-import { appleFont } from "../../layout";
+import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import dynamic from "next/dynamic";

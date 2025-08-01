@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 import { Toaster } from "sonner";
 import { appleFont } from "@/lib/fonts";
 import { metadataDescription, metadataInfo } from "@/constants/constants";
 
 export const metadata: Metadata = {
-  title: metadataInfo.default,
+  title: metadataInfo.register,
   description: metadataDescription.default,
 };
 

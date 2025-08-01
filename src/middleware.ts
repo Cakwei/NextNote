@@ -4,7 +4,7 @@ import { protectedRoutes } from "./constants/constants";
 
 export function middleware(req: NextRequest) {
   // Temporary
-  const isLoggedIn = false;
+  const isLoggedIn = true;
   if (
     protectedRoutes.find((item) => req.nextUrl.pathname === item) &&
     !isLoggedIn
