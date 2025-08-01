@@ -15,11 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${appleFont.className} antialiased`}>
-        {children}
-        <Toaster />
-      </body>
-    </html>
+    <main className={`${appleFont.className} antialiased`}>
+      {children}
+      <Toaster />
+    </main>
   );
 }

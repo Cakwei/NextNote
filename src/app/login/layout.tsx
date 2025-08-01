@@ -5,7 +5,7 @@ import { appleFont } from "@/lib/fonts";
 import { metadataDescription, metadataInfo } from "@/constants/constants";
 
 export const metadata: Metadata = {
-  title: metadataInfo.default,
+  title: metadataInfo.login,
   description: metadataDescription.default,
 };
 
@@ -15,11 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${appleFont.className} antialiased`}>
-        {children}
-        <Toaster />
-      </body>
-    </html>
+    <main className={`${appleFont.className} antialiased`}>
+      {children}
+      <Toaster />
+    </main>
   );
 }
