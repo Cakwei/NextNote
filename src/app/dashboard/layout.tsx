@@ -23,7 +23,7 @@ export default function RootLayout({
         <main className="bg-[#f9f9f9] w-full">
           <SidebarTrigger
             title="Open sidebar"
-            className="sidebarTrigger absolute top-[50%]  translate-x-[-50%] z-100 rounded-[50%] bg-white border border-zinc-400"
+            className="sidebarTrigger  absolute top-[50%] rounded-[50%] translate-x-[-50%] z-100 bg-white border border-zinc-400"
           />
           {children}
           <Toaster />
