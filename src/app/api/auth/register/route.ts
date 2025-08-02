@@ -1,8 +1,12 @@
 import { pool } from "@/lib/db";
-import { FieldPacket, ResultSetHeader } from "mysql2";
+import {
+  FieldPacket,
+  QueryResult,
+  ResultSetHeader,
+} from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const { email, password }: { [key: string]: string } = await req.json();
     const { status, data, message, code } = await register(email, password);
@@ -17,7 +21,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 }
 
 async function register(email: string, password: string) {
-  let [results, fields]: [ResultSetHeader, FieldPacket[]] =
+  let [results]: [ResultSetHeader | QueryResult, FieldPacket[]] =
     await findUserByEmail(email);
   if (Array.isArray(results) && results.length > 0) {
     return {
@@ -29,13 +33,13 @@ async function register(email: string, password: string) {
   }
 
   // If not exists, add into DB
-  [results, fields] = await pool.execute("INSERT INTO accounts VALUES (?, ?)", [
+  [results] = await pool.execute("INSERT INTO accounts VALUES (?, ?)", [
     email,
     password,
   ]);
 
   // Check for any affected rows
-  if (results.affectedRows > 0) {
+  if ((results as ResultSetHeader).affectedRows > 0) {
     return {
       status: "Success",
       data: {},

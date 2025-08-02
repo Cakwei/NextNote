@@ -4,7 +4,6 @@ import {
   useEditor,
   EditorContent,
   Editor as TipTapEditor,
-  mergeAttributes,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -37,7 +36,6 @@ import {
   ListOrdered,
   Undo,
   Redo,
-  Type,
   Palette,
   Table as LucideTable,
   Columns,
@@ -72,46 +70,24 @@ import "./style/editor.css";
 import { fontFamilies, fontSizes } from "@/constants/constants";
 import { Separator } from "@/components/ui/separator";
 
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    setFontSize: {
-      setFontSize: (size: string) => ReturnType;
-    };
-    unsetFontSize: {
-      unsetFontSize: () => ReturnType;
-    };
-    setFontFamily: {
-      setFontFamily: (family: string) => ReturnType;
-    };
-    unsetFontFamily: {
-      unsetFontFamily: () => ReturnType;
-    };
-    setCellAttribute: {
-      setCellAttribute: (
-        attributeName: string,
-        attributeValue: any
-      ) => ReturnType;
-    };
-  }
-}
-
 interface ToolbarProps {
   editor: TipTapEditor | null;
 }
 
 const Toolbar: FC<ToolbarProps> = ({ editor }) => {
-  const [fontSearch, setFontSearch] = useState("");
+  const [fontSearch, setFontSearch] = useState(""); // eslint-disable-line
   const filteredFonts = fontFamilies.filter((font) =>
     font.label.toLowerCase().includes(fontSearch.toLowerCase())
   );
 
+  // eslint-disable-next-line
   const [buttonStates, setButtonStates] = useState({
     bold: false,
     italic: false,
     underline: false,
   });
 
-  const [renderCount, setRenderCount] = useState(0);
+  const [renderCount, setRenderCount] = useState(0); // eslint-disable-line
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
 
@@ -678,6 +654,7 @@ const CustomTableCell = TableCell.extend({
   addCommands() {
     return {
       setCellAttribute:
+      // eslint-disable-next-line
         (attributeName: string, attributeValue: any) =>
         ({ tr, state, dispatch }) => {
           const { selection } = state;
@@ -711,7 +688,7 @@ const CustomTableCell = TableCell.extend({
 export const Note = () => {
   const [activeColor, setActiveColor] = useState("#000000");
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
-  const [renderCount, setRenderCount] = useState(0);
+  const [renderCount, setRenderCount] = useState(0); // eslint-disable-line
 
   const content = ``;
 
@@ -820,8 +797,8 @@ export const Note = () => {
   };
 
   return (
-    <div className="flex w-full h-dvh bg-[#f9f9f9] flex-col gap-5">
-      <header className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg m-0">
+    <div className="flex w-full h-dvh  flex-col gap-5">
+      <header className="flex items-center justify-between p-4 shadow-md rounded-lg m-0">
         <Input className="font-bold text-gray-800 border-none outline-none text-xl" />
       </header>
       <div className="flex flex-1 overflow-hidden gap-2.5">

@@ -8,7 +8,7 @@ const NoteComponent = dynamic(() =>
 
 export default async function Dashboard() {
   return (
-    <div className="p-5">
+    <div className="p-5 bg-[#f9f9f9]">
       <Suspense fallback={<Skeleton className="w-full h-dvh justify-center flex items-center">Loading</Skeleton>}>
         <NoteComponent />
       </Suspense>

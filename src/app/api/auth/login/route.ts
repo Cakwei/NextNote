@@ -1,12 +1,25 @@
 import { pool } from "@/lib/db";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const { email, password }: { [key: string]: string } = await req.json();
+    if (
+      // Check input are string, also check if empty
+      (typeof email !== "string" || typeof password !== "string") &&
+      !email &&
+      !password
+    ) {
+      return NextResponse.json(
+        { status: "Error", data: {}, message: "Invalid request" },
+        { status: 400 }
+      );
+    }
+
     const { status, data, message, code } = await login(email, password);
-    console.log('From login')
     return NextResponse.json({ status, data, message }, { status: code });
   } catch (e) {
     console.error(e);
@@ -18,16 +31,26 @@ export async function POST(req: NextRequest, res: NextResponse) {
 }
 
 async function login(email: string, password: string) {
-  let [results, fields]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+  const [results]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
     "SELECT * FROM accounts WHERE email = ? AND password = ?",
     [email, password]
   );
 
   // If account exists
   if (Array.isArray(results) && results.length > 0) {
+    const SECRET_KEY = process.env.JWT_SECRET;
+    if (!SECRET_KEY) {
+      throw new Error("JWT_SECRET is not defined");
+    }
+
+    // Sign and add JWT to cookie
+    const cookieStore = cookies();
+    const token = jwt.sign({ email: email }, SECRET_KEY as string);
+    (await cookieStore).set("auth", token, { httpOnly: true, secure: true });
+
     return {
       status: "Success",
-      data: {},
+      data: token,
       message: "Logged in successfully",
       code: 200,
     };

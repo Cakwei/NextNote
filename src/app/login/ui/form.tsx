@@ -7,6 +7,7 @@ import axios from "axios";
 import dynamic from "next/dynamic";
 import { ChangeEvent, FormEvent, ReactNode, Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { axiosResponse } from "@/types/types";
 
 {
   /* Dynamic Imports */
@@ -39,12 +40,18 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
     try {
       e.preventDefault();
       setProcessing(true);
-      const results = await axios.post(apiEndpoint.login, {
-        email: formData.email,
-        password: formData.password,
-      });
-      if (results) {
-        console.log(results);
+      const result: axiosResponse = await axios.post(
+        apiEndpoint.login,
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+        { withCredentials: true }
+      );
+
+      if (result.data.status === "Success") {
+        alert(JSON.stringify(result.data));
+        navigation.push("/dashboard");
       }
       setProcessing(false);
     } catch (e) {
@@ -129,7 +136,7 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
           </div>
           <div className="text-center flex-col flex text-sm gap-2.5">
             <label className="text-zinc-400">
-              Don't have an account?{" "}
+              {"Don't have an account? "}
               <span
                 onClick={() => navigation.push("/register")}
                 style={{ color: Colors.applePrimary }}

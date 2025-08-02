@@ -1,12 +1,5 @@
-import { Home, LogOut, LucideIcon, LucideProps, User } from "lucide-react";
-import {
-  CSSProperties,
-  ForwardRefExoticComponent,
-  HTMLAttributes,
-  HTMLProps,
-  ReactNode,
-  RefAttributes,
-} from "react";
+import { LogOut, LucideIcon, User } from "lucide-react";
+import { HTMLProps } from "react";
 
 export const Colors = {
   applePrimary: "#0066cc",
