@@ -7,9 +7,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { PointerEvent } from "react";
-import { sideBarLinks } from "@/constants/constants";
+import { fakeNotesArray, sideBarLinks } from "@/constants/constants";
+import Link from "next/link";
 
 export function DashboardSidebar({
   hoverFunc,
@@ -33,6 +35,22 @@ export function DashboardSidebar({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {false && (
+                <>
+                  <SidebarSeparator />
+
+                  <SidebarGroupLabel>My notes</SidebarGroupLabel>
+                  {fakeNotesArray.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link href={`dashboard?note=${item.id}`}>
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

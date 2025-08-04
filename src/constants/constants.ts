@@ -79,3 +79,11 @@ export const sideBarLinks: SideBarLinks = [
     className: "text-red-400 hover:text-red-400",
   },
 ];
+
+export const fakeNotesArray = [
+  { title: "Science", id: 1 },
+  { title: "Maths", id: 2 },
+  { title: "English", id: 3 },
+  { title: "Biology", id: 4 },
+  { title: "Physics", id: 5 },
+];

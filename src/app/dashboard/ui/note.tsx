@@ -507,7 +507,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
         <button
           onClick={exportJSONFormat}
           className={`w-8 h-8 rounded-full border-2 border-transparent flex items-center justify-center`}
-          title="Manual save to database"
+          title="Save"
         >
           <Save size={16} color={"black"} />
         </button>
