@@ -50,7 +50,6 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
       );
 
       if (result.data.status === "Success") {
-        alert(JSON.stringify(result.data));
         navigation.push("/dashboard");
       }
       setProcessing(false);
