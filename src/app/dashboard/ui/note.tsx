@@ -1,5 +1,13 @@
 "use client";
-import React, { useState, FC, useEffect, useRef, ChangeEvent } from "react";
+import React, {
+  useState,
+  FC,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+  MouseEventHandler,
+} from "react";
 import {
   useEditor,
   EditorContent,
@@ -40,6 +48,8 @@ import {
   Columns,
   Rows,
   Trash2,
+  Save,
+  Download,
 } from "lucide-react";
 import {
   Select,
@@ -171,7 +181,6 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
       reader.readAsDataURL(file);
     }
   };
-
   const openLinkModal = () => {
     const currentLink = editor.getAttributes("link").href;
     setLinkUrl(currentLink || "");
@@ -240,6 +249,20 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
     if (editor.isActive("table")) {
       editor.chain().focus().setCellAttribute("backgroundColor", color).run();
     }
+  };
+
+  const exportJSONFormat = () => {
+    const blob = new Blob([JSON.stringify(editor?.getJSON())], {
+      type: "application/json",
+    });
+    console.log(blob);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "Downloaded Note";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const isTableActive = editor.isActive("table");
@@ -322,7 +345,10 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
             <LucideLink size={16} />
           </button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent
+          aria-describedby={undefined}
+          className="sm:max-w-[425px]"
+        >
           <DialogHeader>
             <DialogTitle>
               {editor.isActive("link") ? "Edit Link" : "Add Link"}
@@ -478,7 +504,28 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
             />
           </button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <button
+          onClick={exportJSONFormat}
+          className={`w-8 h-8 rounded-full border-2 border-transparent flex items-center justify-center`}
+          title="Custom Cell Color"
+        >
+          <Save size={16} color={"black"} />
+        </button>
+        <button
+          onClick={() => {
+            let json = prompt("ewvw");
+            json = JSON.parse(json || "");
+            editor.commands.setContent(json);
+          }}
+          className={`w-8 h-8 rounded-full border-2 border-transparent flex items-center justify-center`}
+          title="Custom Cell Color"
+        >
+          <Download size={16} color={"black"} />
+        </button>
+        <DialogContent
+          aria-describedby={undefined}
+          className="sm:max-w-[425px]"
+        >
           <DialogHeader>
             <DialogTitle>Select Text Color</DialogTitle>
           </DialogHeader>
@@ -560,7 +607,10 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
         open={isCustomTextColorModalOpen}
         onOpenChange={setIsCustomTextColorModalOpen}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent
+          aria-describedby={undefined}
+          className="sm:max-w-[425px]"
+        >
           <DialogHeader>
             <DialogTitle>Select a Custom Text Color</DialogTitle>
           </DialogHeader>
@@ -591,7 +641,10 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
         open={isCellColorModalOpen}
         onOpenChange={setIsCellColorModalOpen}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent
+          aria-describedby={undefined}
+          className="sm:max-w-[425px]"
+        >
           <DialogHeader>
             <DialogTitle>Select a Custom Cell Color</DialogTitle>
           </DialogHeader>
@@ -739,16 +792,14 @@ export const Note = () => {
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const [renderCounter, setRenderCounter] = useState(0);
 
-  const content = ``;
-
   const editor = useEditor({
+    enableContentCheck: true,
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         bulletList: { keepMarks: true, keepAttributes: false },
         orderedList: { keepMarks: true, keepAttributes: false },
       }),
-      Underline,
       TextStyle,
       Color,
       FontSize,
@@ -768,7 +819,6 @@ export const Note = () => {
       FontFamily,
       CellSelectKeymap,
     ],
-    content: content,
     editorProps: {
       attributes: {
         class:
@@ -779,7 +829,7 @@ export const Note = () => {
 
   useEffect(() => {
     if (editor) {
-      editor.chain().focus().run();
+      editor.chain().run();
       const handleUpdate = () => {
         setRenderCounter((prev) => prev + 1);
       };
@@ -903,148 +953,162 @@ export const Note = () => {
   };
 
   return (
-    <div className="flex w-full h-dvh flex-col gap-5">
-      <header className="flex items-center justify-between p-4 shadow-md rounded-lg m-0">
-        <Input className="font-bold text-gray-800 border-none outline-none text-xl" />
-      </header>
-      <div className="w-full flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow-md mb-0.5 ml-0.5">
-        <div className="sticky top-0 z-10 bg-white">
-          <Toolbar editor={editor} />
-        </div>
-        <div className="w-full h-full" onContextMenu={handleContextMenu}>
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
-              <div
-                className="h-full w-full p-4 bordered-table-container"
-                onPointerDown={() => {
-                  checkClipboardContent();
-                }}
-              >
-                <EditorContent editor={editor} className="h-full" />
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              {isImageActive() ? (
-                <>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("cut", editor)}
-                  >
-                    Cut
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("copy", editor)}
-                  >
-                    Copy
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("deleteImage", editor)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Image
-                  </ContextMenuItem>
-                </>
-              ) : editor.isActive("table") ? (
-                <>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("cut", editor)}
-                  >
-                    Cut
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("copy", editor)}
-                  >
-                    Copy
-                  </ContextMenuItem>
-                  <ContextMenuSub>
-                    <ContextMenuSubTrigger>
-                      <Rows className="mr-2 h-4 w-4" />
-                      <span>Row</span>
-                    </ContextMenuSubTrigger>
-                    <ContextMenuSubContent>
-                      <ContextMenuItem
-                        onClick={() => handleContextMenuAction("addRowBefore", editor)}
-                      >
-                        Add Row Above
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        onClick={() => handleContextMenuAction("addRowAfter", editor)}
-                      >
-                        Add Row Below
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        onClick={() => handleContextMenuAction("deleteRow", editor)}
-                      >
-                        Delete Row
-                      </ContextMenuItem>
-                    </ContextMenuSubContent>
-                  </ContextMenuSub>
-                  <ContextMenuSub>
-                    <ContextMenuSubTrigger>
-                      <Columns className="mr-2 h-4 w-4" />
-                      <span>Column</span>
-                    </ContextMenuSubTrigger>
-                    <ContextMenuSubContent>
-                      <ContextMenuItem
-                        onClick={() =>
-                          handleContextMenuAction("addColumnBefore", editor)
-                        }
-                      >
-                        Add Column Left
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        onClick={() =>
-                          handleContextMenuAction("addColumnAfter", editor)
-                        }
-                      >
-                        Add Column Right
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        onClick={() => handleContextMenuAction("deleteColumn", editor)}
-                      >
-                        Delete Column
-                      </ContextMenuItem>
-                    </ContextMenuSubContent>
-                  </ContextMenuSub>
-                  <ContextMenuItem
-                    style={{ color: "red" }}
-                    onClick={() => handleContextMenuAction("deleteTable", editor)}
-                  >
-                    Delete Table
-                  </ContextMenuItem>
-                </>
-              ) : (
-                <>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("cut", editor)}
-                    disabled={!hasSelectedText()}
-                  >
-                    Cut
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("copy", editor)}
-                    disabled={!hasSelectedText()}
-                  >
-                    Copy
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={() => handleContextMenuAction("paste", editor)}
-                    disabled={!hasClipboardContent}
-                  >
-                    Paste
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    style={{ color: "red" }}
-                    onClick={() => handleContextMenuAction("delete", editor)}
-                    disabled={!hasSelectedText()}
-                  >
-                    Delete
-                  </ContextMenuItem>
-                </>
-              )}
-            </ContextMenuContent>
-          </ContextMenu>
+    <>
+      <div className="flex w-full h-dvh flex-col gap-5">
+        <header className="flex items-center justify-between p-4 shadow-md rounded-lg m-0">
+          <Input className="font-bold text-gray-800 border-none outline-none text-xl" />
+        </header>
+        <div className="w-full flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow-md mb-0.5 ml-0.5">
+          <div className="sticky top-0 z-10 bg-white">
+            <Toolbar editor={editor} />
+          </div>
+          <div className="w-full h-full" onContextMenu={handleContextMenu}>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <div
+                  className="h-full w-full p-4 bordered-table-container"
+                  onPointerDown={() => {
+                    checkClipboardContent();
+                  }}
+                >
+                  <EditorContent editor={editor} className="h-full" />
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                {isImageActive() ? (
+                  <>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("cut", editor)}
+                    >
+                      Cut
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("copy", editor)}
+                    >
+                      Copy
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() =>
+                        handleContextMenuAction("deleteImage", editor)
+                      }
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Image
+                    </ContextMenuItem>
+                  </>
+                ) : editor.isActive("table") ? (
+                  <>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("cut", editor)}
+                    >
+                      Cut
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("copy", editor)}
+                    >
+                      Copy
+                    </ContextMenuItem>
+                    <ContextMenuSub>
+                      <ContextMenuSubTrigger>
+                        <Rows className="mr-2 h-4 w-4" />
+                        <span>Row</span>
+                      </ContextMenuSubTrigger>
+                      <ContextMenuSubContent>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("addRowBefore", editor)
+                          }
+                        >
+                          Add Row Above
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("addRowAfter", editor)
+                          }
+                        >
+                          Add Row Below
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("deleteRow", editor)
+                          }
+                        >
+                          Delete Row
+                        </ContextMenuItem>
+                      </ContextMenuSubContent>
+                    </ContextMenuSub>
+                    <ContextMenuSub>
+                      <ContextMenuSubTrigger>
+                        <Columns className="mr-2 h-4 w-4" />
+                        <span>Column</span>
+                      </ContextMenuSubTrigger>
+                      <ContextMenuSubContent>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("addColumnBefore", editor)
+                          }
+                        >
+                          Add Column Left
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("addColumnAfter", editor)
+                          }
+                        >
+                          Add Column Right
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          onClick={() =>
+                            handleContextMenuAction("deleteColumn", editor)
+                          }
+                        >
+                          Delete Column
+                        </ContextMenuItem>
+                      </ContextMenuSubContent>
+                    </ContextMenuSub>
+                    <ContextMenuItem
+                      style={{ color: "red" }}
+                      onClick={() =>
+                        handleContextMenuAction("deleteTable", editor)
+                      }
+                    >
+                      Delete Table
+                    </ContextMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("cut", editor)}
+                      disabled={!hasSelectedText()}
+                    >
+                      Cut
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("copy", editor)}
+                      disabled={!hasSelectedText()}
+                    >
+                      Copy
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleContextMenuAction("paste", editor)}
+                      disabled={!hasClipboardContent}
+                    >
+                      Paste
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      style={{ color: "red" }}
+                      onClick={() => handleContextMenuAction("delete", editor)}
+                      disabled={!hasSelectedText()}
+                    >
+                      Delete
+                    </ContextMenuItem>
+                  </>
+                )}
+              </ContextMenuContent>
+            </ContextMenu>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

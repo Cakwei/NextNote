@@ -10,8 +10,7 @@ export async function POST(req: NextRequest) {
     if (
       // Check input are string, also check if empty
       (typeof email !== "string" || typeof password !== "string") &&
-      !email &&
-      !password
+      (!email || !password)
     ) {
       return NextResponse.json(
         { status: "Error", data: {}, message: "Invalid request" },
