@@ -2,6 +2,9 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
 
+{
+  /* Dynamic Imports */
+}
 const NoteComponent = dynamic(() =>
   import("@/app/dashboard/ui/note").then((module) => module.Note)
 );
@@ -15,7 +18,8 @@ export default async function Dashboard() {
             Loading Editor...
           </Skeleton>
         }
-      ><NoteComponent />
+      >
+        <NoteComponent />
       </Suspense>
     </div>
   );

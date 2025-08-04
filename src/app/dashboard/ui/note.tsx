@@ -507,7 +507,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
         <button
           onClick={exportJSONFormat}
           className={`w-8 h-8 rounded-full border-2 border-transparent flex items-center justify-center`}
-          title="Custom Cell Color"
+          title="Manual save to database"
         >
           <Save size={16} color={"black"} />
         </button>
@@ -518,7 +518,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
             editor.commands.setContent(json);
           }}
           className={`w-8 h-8 rounded-full border-2 border-transparent flex items-center justify-center`}
-          title="Custom Cell Color"
+          title="Export Notes"
         >
           <Download size={16} color={"black"} />
         </button>

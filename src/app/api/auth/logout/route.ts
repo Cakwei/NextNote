@@ -1,16 +1,19 @@
-import { pool } from "@/lib/db";
-import {
-  FieldPacket,
-  QueryResult,
-  ResultSetHeader,
-} from "mysql2";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password }: { [key: string]: string } = await req.json();
-    const { status, data, message, code } = await register(email, password);
-    return NextResponse.json({ status, data, message }, { status: code });
+    const isSuccess = await logOut();
+    if (isSuccess) {
+      return NextResponse.json(
+        { status: "Success", data: {}, message: "Successfully logged out" },
+        { status: 200 }
+      );
+    }
+    return NextResponse.json(
+      { status: "Error", data: {}, message: "Log out failed" },
+      { status: 401 }
+    );
   } catch (e) {
     console.error(e);
     return NextResponse.json(
@@ -20,47 +23,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function register(email: string, password: string) {
-  let [results]: [ResultSetHeader | QueryResult, FieldPacket[]] =
-    await findUserByEmail(email);
-  if (Array.isArray(results) && results.length > 0) {
-    return {
-      status: "Error",
-      data: {},
-      message: "Account already exists.",
-      code: 409,
-    };
+async function logOut() {
+  try {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get("auth");
+    if (cookie) {
+      cookieStore.delete("auth");
+      return true;
+    }
+  } catch (e) {
+    console.error(e);
+    return false;
   }
-
-  // If not exists, add into DB
-  [results] = await pool.execute("INSERT INTO accounts VALUES (?, ?)", [
-    email,
-    password,
-  ]);
-
-  // Check for any affected rows
-  if ((results as ResultSetHeader).affectedRows > 0) {
-    return {
-      status: "Success",
-      data: {},
-      message: "Account created successfully.",
-      code: 201,
-    };
-  }
-  // If no rows
-  return {
-    status: "Error",
-    data: {},
-    message: "An error occured",
-    code: 404,
-  };
-}
-
-// Quick Functions
-async function findUserByEmail(email: string) {
-  const [results, fields] = await pool.execute(
-    "SELECT * FROM accounts WHERE email = ?",
-    [email]
-  );
-  return [results, fields] as [ResultSetHeader, FieldPacket[]];
 }
