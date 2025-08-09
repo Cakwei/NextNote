@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
+  crossOrigin: "anonymous",
 };
 
 export default nextConfig;
