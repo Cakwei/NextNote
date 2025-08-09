@@ -5,6 +5,19 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [],
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "localhost:3000, note.cakwei.com, *.cloudflareinsights.com", // Set your origin
+          },
+        ],
+      },
+    ];
+  },
   experimental: {
     globalNotFound: true,
   },
