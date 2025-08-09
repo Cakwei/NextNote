@@ -42,7 +42,7 @@ export async function verifyToken(token: string) {
     if (e instanceof JOSEError) {
       console.log("Failed to verify token @ jwt.ts");
     }
-    return "";
+    return ;
   }
 }
 
