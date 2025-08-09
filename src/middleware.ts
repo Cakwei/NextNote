@@ -3,9 +3,8 @@ import { NextRequest } from "next/server";
 import { protectedRoutes } from "./constants/constants";
 import { cookies } from "next/headers";
 import { verifyToken } from "./lib/jwt";
-import * as jwt from "jose";
 
-export async function middleware(req: NextRequest, res: NextResponse) {
+export async function middleware(req: NextRequest) {
   const middlewares = [convertURLTolowerCase, checkUserLoggedIn];
 
   let response = NextResponse.next();
