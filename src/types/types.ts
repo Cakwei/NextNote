@@ -8,3 +8,4 @@ export interface axiosResponse extends AxiosResponse {
     code: number;
   };
 }
+
