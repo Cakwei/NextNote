@@ -1,29 +1,51 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { protectedRoutes } from "./constants/constants";
+import { cookies } from "next/headers";
+import { verifyToken } from "./lib/jwt";
+import * as jwt from "jose";
 
-export function middleware(req: NextRequest) {
-  // Temporary
-  const isLoggedIn = true;
-  if (
-    protectedRoutes.find((item) => req.nextUrl.pathname === item) &&
-    !isLoggedIn
-  ) {
-    // Redirect to a new URL
-    return NextResponse.redirect(new URL("/login", req.url));
+export async function middleware(req: NextRequest, res: NextResponse) {
+  const middlewares = [convertURLTolowerCase, checkUserLoggedIn];
+
+  let response = NextResponse.next();
+  for (const mw of middlewares) {
+    response = (await mw(req)) || response;
+  }
+  return response;
+}
+
+// Others //
+function convertURLTolowerCase(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (pathname !== pathname.toLowerCase()) {
+    // If not, redirect to the lowercase version
+    return NextResponse.redirect(new URL(pathname.toLowerCase(), req.url));
+  }
+  return NextResponse.next();
+}
+
+async function checkUserLoggedIn(req: NextRequest) {
+  try {
+    const token = (await cookies()).get("auth")?.value || "";
+    const isTokenVerified = await verifyToken(token);
+
+    // If entering protected route and cannot be authenticated
+    if (
+      protectedRoutes.find((item) => req.nextUrl.pathname === item) &&
+      !isTokenVerified
+    ) {
+      // Redirect to a new URL
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    console.log("A user logged in", req.nextUrl.pathname);
+  } catch (e) {
+    console.log(e);
   }
 }
+
 export const config = {
   // Match all paths except those starting with _next/static, _next/image, and favicon.ico
   // This is a common pattern to exclude static assets.
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (if you want to exclude all API routes, though often middleware is used for APIs)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|api).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };

@@ -367,3 +367,21 @@ ul[data-type="taskList"] li > div {
 .h-full {
   height: 100%;
 }
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 5px; /* Sets the width of the scrollbar */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.2
+  ); /* Sets the color and transparency of the scrollbar handle */
+  border-radius: 10px; /* Optional: adds rounded corners to the handle */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Makes the scrollbar track transparent */
+}

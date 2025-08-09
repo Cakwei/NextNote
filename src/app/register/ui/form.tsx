@@ -3,40 +3,17 @@
 import { apiEndpoint, Colors } from "@/constants/constants";
 import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { axiosResponse, RegisterAccount } from "@/types/types";
 import axios from "axios";
-import dynamic from "next/dynamic";
-import {
-  ChangeEvent,
-  FormEvent,
-  ReactNode,
-  Suspense,
-  useEffect,
-  useState,
-} from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-
-{
-  /* Dynamic Imports */
-}
-const ButtonComponent = dynamic(() =>
-  import("@/components/ui/button").then((module) => ({
-    default: module.Button,
-  }))
-);
-const InputComponent = dynamic(() =>
-  import("@/components/ui/input").then((module) => ({
-    default: module.Input,
-  }))
-);
-
-type UserAccount = {
-  email: string;
-  password: string;
-};
+import z from "zod";
 
 export default function RegisterForm({ children }: { children?: ReactNode }) {
   const navigation = useRouter();
-  const [formData, setFormData] = useState<UserAccount>({
+  const [processing, setProcessing] = useState(false);
+  const [formData, setFormData] = useState<RegisterAccount>({
     email: "",
     password: "",
   });
@@ -44,15 +21,25 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
   async function register(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      const results = await axios.post(apiEndpoint.register, {
-        email: formData.email,
-        password: formData.password,
-      });
-      if (results) {
-        console.log(results);
+      setProcessing(true);
+      const isEmail = z.email().parse(formData.email);
+      const isPasswordString = z.string().parse(formData.password);
+
+      if (isEmail && isPasswordString) {
+        const results: axiosResponse = await axios.post(apiEndpoint.register, {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (results.data.status === "Success") {
+          navigation.push("/login");
+        }
       }
+
+      setProcessing(false);
     } catch (e) {
       console.error(e);
+      setProcessing(false);
     }
   }
 
@@ -65,9 +52,6 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
     }));
   }
 
-  useEffect(() => {
-    console.log(JSON.stringify(formData));
-  }, [formData, setFormData]);
   return (
     <>
       <form
@@ -90,44 +74,38 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
         {/* Video Animation */}
 
         <div className="flex justify-center">
-          <Suspense
-            fallback={
-              <Skeleton className="w-full h-full mt-5 min-h-25 min-w-25 lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px]" />
-            }
+          <video
+            width="0"
+            preload="none"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px] "
           >
-            <video
-              width="0"
-              preload="none"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px] "
-            >
-              <source src="/Login.mp4" />
-              <track
-                src={undefined}
-                kind="subtitles"
-                srcLang="en"
-                label="English"
-              />
-              Your browser does not support the video tag.
-            </video>
-          </Suspense>
+            <source src="/Login.mp4" />
+            <track
+              src={undefined}
+              kind="subtitles"
+              srcLang="en"
+              label="English"
+            />
+            Your browser does not support the video tag.
+          </video>
         </div>
 
         {/* Inputs */}
         <div className="flex flex-col gap-2.5">
           <h1 className="font-bold text-2xl text-center">Account Sign Up</h1>
           <div className="flex flex-col gap-5">
-            <InputComponent
+            <Input
               onChange={handleInputChange}
               name="email"
               placeholder="Email"
               className="py-5"
             />
 
-            <InputComponent
+            <Input
               onChange={handleInputChange}
               name="password"
               placeholder="Password"
@@ -145,12 +123,12 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
                 Sign in
               </span>
             </label>
-            <ButtonComponent
+            <Button
               className={`bg-[#0066cc] hover:bg-[#0066cc]/75 py-5 text-md  ${appleFont.className}`}
               title="Press to attempt login"
             >
-              Register
-            </ButtonComponent>
+              {processing ? "Registering..." : "Register"}
+            </Button>
           </div>
         </div>
 

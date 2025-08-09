@@ -1,8 +1,8 @@
 import { pool } from "@/lib/db";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { signToken } from "@/lib/jwt";
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +44,12 @@ async function login(email: string, password: string) {
 
     // Sign and add JWT to cookie
     const cookieStore = cookies();
-    const token = jwt.sign({ email: email }, SECRET_KEY as string);
+    const token = await signToken({ email: email });
+
+    if (!token) {
+      throw Error("Error occured when signing token ");
+    }
+
     (await cookieStore).set("auth", token, { httpOnly: true, secure: true });
 
     return {

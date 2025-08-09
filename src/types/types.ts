@@ -9,3 +9,9 @@ export interface axiosResponse extends AxiosResponse {
   };
 }
 
+export type LoginAccount = {
+  email: string;
+  password: string;
+};
+
+export type RegisterAccount = { email: string; password: string };

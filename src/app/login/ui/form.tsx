@@ -3,54 +3,40 @@
 import { apiEndpoint, Colors } from "@/constants/constants";
 import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
+import { axiosResponse, LoginAccount } from "@/types/types";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { z } from "zod";
 import axios from "axios";
-import dynamic from "next/dynamic";
-import { ChangeEvent, FormEvent, ReactNode, Suspense, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { axiosResponse } from "@/types/types";
-
-{
-  /* Dynamic Imports */
-}
-const ButtonComponent = dynamic(() =>
-  import("@/components/ui/button").then((module) => ({
-    default: module.Button,
-  }))
-);
-const InputComponent = dynamic(() =>
-  import("@/components/ui/input").then((module) => ({
-    default: module.Input,
-  }))
-);
-
-type UserAccount = {
-  email: string;
-  password: string;
-};
 
 export default function LoginForm({ children }: { children?: ReactNode }) {
   const navigation = useRouter();
-  const [formData, setFormData] = useState<UserAccount>({
+  const [processing, setProcessing] = useState(false);
+  const [formData, setFormData] = useState<LoginAccount>({
     email: "",
     password: "",
   });
-  const [processing, setProcessing] = useState(false);
 
-  async function login(e: FormEvent) {
+  async function login(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
       setProcessing(true);
-      const result: axiosResponse = await axios.post(
-        apiEndpoint.login,
-        {
-          email: formData.email,
-          password: formData.password,
-        },
-        { withCredentials: true }
-      );
+      const isEmail = z.email().parse(formData.email);
+      const isPasswordString = z.string().parse(formData.password);
+      if (isEmail && isPasswordString) {
+        const result: axiosResponse = await axios.post(
+          apiEndpoint.login,
+          {
+            email: formData.email,
+            password: formData.password,
+          },
+          { withCredentials: true }
+        );
 
-      if (result.data.status === "Success") {
-        navigation.push("/dashboard");
+        if (result.data.status === "Success") {
+          navigation.push("/dashboard");
+        }
       }
       setProcessing(false);
     } catch (e) {
@@ -88,45 +74,40 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
         */}
 
         {/* Video Animation */}
+
         <div className="flex justify-center">
-          <Suspense
-            fallback={
-              <Skeleton className="w-full h-full mt-5 min-h-25 min-w-25 lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px]" />
-            }
+          <video
+            width="0"
+            preload="none"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px]"
           >
-            <video
-              width="0"
-              preload="none"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full lg:max-w-[350px] max-w-[250px] lg:max-h-[350px] max-h-[250px]"
-            >
-              <source src="/Login.mp4" />
-              <track
-                src={undefined}
-                kind="subtitles"
-                srcLang="en"
-                label="English"
-              />
-              Your browser does not support the video tag.
-            </video>
-          </Suspense>
+            <source src="/Login.mp4" />
+            <track
+              src={undefined}
+              kind="subtitles"
+              srcLang="en"
+              label="English"
+            />
+            Your browser does not support the video tag.
+          </video>
         </div>
 
         {/* Inputs */}
         <div className="flex flex-col gap-2.5">
           <h1 className="font-bold text-2xl text-center">Login with email</h1>
           <div className="flex flex-col gap-5">
-            <InputComponent
+            <Input
               onChange={handleInputChange}
               name="email"
               placeholder="Email"
               className="py-5"
             />
 
-            <InputComponent
+            <Input
               onChange={handleInputChange}
               name="password"
               placeholder="Password"
@@ -144,14 +125,14 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
                 Sign in
               </span>
             </label>
-            <ButtonComponent
+            <Button
               type="submit"
               disabled={processing}
               className={`bg-[#0066cc] hover:bg-[#0066cc]/75 py-5 text-md  ${appleFont.className}`}
               title="Press to attempt login"
             >
               {processing ? "Logging in..." : "Login"}
-            </ButtonComponent>
+            </Button>
           </div>
         </div>
 

@@ -10,27 +10,27 @@ export default function Logout() {
   const [loggedOut, setLoggedOut] = useState<boolean | null>(null);
   const navigation = useRouter();
 
-  async function logOut() {
-    try {
-      const result: axiosResponse = await axios.post(
-        `${apiEndpoint.logout}`,
-        {},
-        { withCredentials: true }
-      );
-      if (result.data.status === "Success") {
-        setLoggedOut(true);
-        setLoading(false);
-        setTimeout(() => navigation.push("/login"), 500);
-      }
-    } catch (e) {
-      setLoading(false);
-      console.error(e);
-    }
-  }
-
   useEffect(() => {
+    async function logOut() {
+      try {
+        const result: axiosResponse = await axios.post(
+          `${apiEndpoint.logout}`,
+          {},
+          { withCredentials: true }
+        );
+        if (result.data.status === "Success") {
+          setLoggedOut(true);
+          setLoading(false);
+          setTimeout(() => navigation.push("/login"), 500);
+        }
+      } catch (e) {
+        setLoading(false);
+        console.error(e);
+      }
+    }
     logOut();
-  }, []);
+  }, [navigation]);
+
   return (
     <div className="flex justify-center w-dvw h-dvh items-center">
       {loading

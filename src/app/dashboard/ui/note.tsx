@@ -25,7 +25,6 @@ import Blockquote from "@tiptap/extension-blockquote";
 import CodeBlock from "@tiptap/extension-code-block";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { findParentNodeOfType } from "prosemirror-utils";
-
 import {
   Bold,
   Italic,
@@ -67,7 +66,7 @@ import "./style/editor.css";
 import { fontFamilies, fontSizes } from "@/constants/constants";
 import { Separator } from "@/components/ui/separator";
 import { Extension } from "@tiptap/core";
-import { EditorState, TextSelection, Transaction } from "prosemirror-state";
+import { TextSelection } from "prosemirror-state";
 import {
   AlignCenter,
   AlignJustify,
@@ -103,6 +102,7 @@ declare module "@tiptap/core" {
   }
 }
 const Toolbar: FC<ToolbarProps> = ({ editor }) => {
+  // eslint-disable-next-line
   const [fontSearch, setFontSearch] = useState("");
   const filteredFonts = fontFamilies.filter((font) =>
     font.label.toLowerCase().includes(fontSearch.toLowerCase())
@@ -118,10 +118,11 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [isTextColorModalOpen, setIsTextColorModalOpen] = useState(false);
+  // eslint-disable-next-line
   const [isCellColorModalOpen, setIsCellColorModalOpen] = useState(false);
+  // eslint-disable-next-line
   const [isCustomTextColorModalOpen, setIsCustomTextColorModalOpen] =
     useState(false);
-  const [customColor, setCustomColor] = useState("#000000");
   const [activeColor, setActiveColor] = useState("#000000");
   const colors = [
     "#000000",
@@ -595,11 +596,11 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
       </button>
       <button
         onClick={() => {
-          let json = prompt("Paste your JSON here to load a note:");
+          const json = prompt("Paste your JSON here to load a note:");
           if (json) {
             try {
               editor.commands.setContent(JSON.parse(json));
-            } catch (e) {
+            } catch {
               alert("Invalid JSON format.");
             }
           }
@@ -758,7 +759,8 @@ export const Note = () => {
           "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none h-full p-4",
       },
       // Modified handlePaste to handle HTML with image tags
-      handlePaste(view, event, slice) {
+      // eslint-disable-next-line
+      handlePaste(eview, event, slice) {
         const items = Array.from(event.clipboardData?.items || []);
 
         // Handle raw image files (from outside the editor)
@@ -831,7 +833,7 @@ export const Note = () => {
       } else {
         setHasClipboardContent(false);
       }
-    } catch (err) {
+    } catch {
       setHasClipboardContent(false);
     }
   };
@@ -945,7 +947,7 @@ export const Note = () => {
         </div>
         {/* Modified this div to handle overflow-y-auto */}
         <div
-          className="w-full h-full overflow-y-auto"
+          className="w-full h-full overflow-y-auto thin-scrollbar"
           onContextMenu={handleContextMenu}
         >
           <ContextMenu>
@@ -984,10 +986,13 @@ export const Note = () => {
                 Copy
               </ContextMenuItem>
               <ContextMenuItem
-                onClick={() => editor.chain().focus().paste().run()}
+                onClick={() =>
+                  /*editor.chain().focus().paste().run()*/
+                  document.execCommand("paste")
+                }
                 disabled={!hasClipboardContent}
               >
-                Paste
+                z Paste
               </ContextMenuItem>
               <Separator className="my-1" />
               <ContextMenuItem
