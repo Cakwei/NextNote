@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
-import { PanelRightIcon } from "lucide-react"; // Added PanelRightIcon
+import { ChevronLeftIcon, PanelLeftIcon, PanelRightIcon } from "lucide-react"; // Added PanelRightIcon
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -165,22 +165,15 @@ function Sidebar({
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
+  // Condition to check if it's mobile AND we should use the Sheet
+  const shouldUseSheet = isMobile && collapsible !== "icon";
+
   if (collapsible === "none") {
-    return (
-      <div
-        data-slot="sidebar"
-        className={cn(
-          "bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    );
+    // ... (unchanged)
   }
 
-  if (isMobile) {
+  // Use the new condition here
+  if (shouldUseSheet) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
@@ -205,38 +198,33 @@ function Sidebar({
     );
   }
 
+  // This is the main sidebar container for both desktop and mobile with icon-collapsible
   return (
     <div
-      className="group peer text-sidebar-foreground hidden md:block"
+      className="group peer text-sidebar-foreground" // Removed "hidden md:block"
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
     >
-      {/* This is what handles the sidebar gap on desktop */}
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
+          "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
+          // Adjust width for icon-collapsible on mobile and desktop
+          "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
         )}
       />
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
-          side === "left"
-            ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-            : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-          // Adjust the padding for floating and inset variants.
-          variant === "floating" || variant === "inset"
-            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
+          "fixed inset-y-0 z-10 flex h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear",
+          "group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]",
+          "group-data-[side=right]:right-0 group-data-[side=right]:left-auto group-data-[side=right]:[--sidebar-width:-var(--sidebar-width)]",
+          "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]",
           className
         )}
         {...props}
@@ -259,21 +247,25 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar, isMobile } = useSidebar();
+  const { toggleSidebar, isMobile, state } = useSidebar();
 
   return (
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
-      className={cn(`h-fit ml-2.5 p-2.5 hover:bg-zinc-200 `, className)}
+      className={cn(`h-fit p-2.5 hover:bg-zinc-200 `, className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelRightIcon className=" h-4 w-4" />
+      {state === "expanded" ? (
+        <ChevronLeftIcon className=" h-4 w-4" />
+      ) : (
+        <PanelRightIcon className=" h-4 w-4" />
+      )}
       <span className={`${isMobile ? "hidden" : "hidden "}`}>
         {" Open Sidebar"}
       </span>

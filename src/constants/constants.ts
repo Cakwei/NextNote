@@ -1,4 +1,4 @@
-import { LogOut, LucideIcon, User } from "lucide-react";
+import { LogOut, LucideIcon, NotebookIcon, User } from "lucide-react";
 import { HTMLProps } from "react";
 
 export const Colors = {
@@ -81,9 +81,9 @@ export const sideBarLinks: SideBarLinks = [
 ];
 
 export const fakeNotesArray = [
-  { title: "Science", id: 1 },
-  { title: "Maths", id: 2 },
-  { title: "English", id: 3 },
-  { title: "Biology", id: 4 },
-  { title: "Physics", id: 5 },
+  { title: "Science", id: 1, icon: NotebookIcon },
+  { title: "Maths", id: 2, icon: NotebookIcon },
+  { title: "English", id: 3, icon: NotebookIcon },
+  { title: "Biology", id: 4, icon: NotebookIcon },
+  { title: "Physics", id: 5, icon: NotebookIcon },
 ];

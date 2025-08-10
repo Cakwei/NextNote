@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import { LucideIcon } from "lucide-react";
 
 export interface axiosResponse extends AxiosResponse {
   data: {
@@ -15,3 +16,5 @@ export type LoginAccount = {
 };
 
 export type RegisterAccount = { email: string; password: string };
+
+export type NavLink = { label: string; href: string; icon: LucideIcon }[];

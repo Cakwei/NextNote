@@ -1,10 +1,7 @@
 import { pool } from "@/lib/db";
-import {
-  FieldPacket,
-  QueryResult,
-  ResultSetHeader,
-} from "mysql2";
+import { FieldPacket, QueryResult, ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +30,8 @@ async function register(email: string, password: string) {
   }
 
   // If not exists, add into DB
-  [results] = await pool.execute("INSERT INTO accounts VALUES (?, ?)", [
+  [results] = await pool.execute("INSERT INTO accounts VALUES (?, ?, ?)", [
+    uuidv4(),
     email,
     password,
   ]);
