@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: metadataDescription.default,
 };
 
-export default function DashboardLayout({
+export default function NoteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

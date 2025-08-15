@@ -18,3 +18,11 @@ export type LoginAccount = {
 export type RegisterAccount = { email: string; password: string };
 
 export type NavLink = { label: string; href: string; icon: LucideIcon }[];
+
+export type INotes = {
+  id: string;
+  title: string;
+  data: string;
+  creationDate: string;
+  modifiedDate: string;
+};

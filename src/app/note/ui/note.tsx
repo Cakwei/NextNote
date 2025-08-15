@@ -942,7 +942,7 @@ export const Note = () => {
         />
       </header>
       <div className="w-full flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow-md mb-0.5 ml-0.5">
-        <div className="sticky top-0 z-10 bg-white">
+        <div className="sticky top-0 bg-white">
           <Toolbar editor={editor} />
         </div>
         {/* Modified this div to handle overflow-y-auto */}

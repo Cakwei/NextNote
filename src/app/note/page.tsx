@@ -1,12 +1,15 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Body } from "@/app/dashboard/component/body";
+import dynamic from "next/dynamic";
 
 {
   /* Dynamic Imports */
 }
+const NoteComponent = dynamic(() =>
+  import("@/app/note/ui/note").then((module) => module.Note)
+);
 
-export default async function Dashboard() {
+export default async function Note() {
   return (
     <div className="p-5 bg-[#f9f9f9] ">
       <Suspense
@@ -16,7 +19,7 @@ export default async function Dashboard() {
           </Skeleton>
         }
       >
-        <Body />
+        <NoteComponent />
       </Suspense>
     </div>
   );
