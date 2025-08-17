@@ -35,8 +35,18 @@ async function checkUserLoggedIn(req: NextRequest) {
       !isTokenVerified
     ) {
       // Redirect to a new URL
-     // return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/login", req.url));
     }
+
+    if (
+      isTokenVerified &&
+      (req.nextUrl.pathname === "/login" ||
+        req.nextUrl.pathname === "/register")
+    ) {
+      // Redirect to a new URL
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
     console.log("A user logged in", req.nextUrl.pathname);
   } catch (e) {
     console.log(e);
