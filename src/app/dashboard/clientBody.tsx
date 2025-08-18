@@ -2,6 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
   Table,
   TableBody,
   TableCaption,
@@ -10,58 +20,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Colors, invoices } from "@/constants/constants";
 import { INotes } from "@/types/types";
+import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function DashboardTable() {
   const [notes, setNotes] = useState<INotes[]>([]);
-
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ];
-
+  const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
   function renderItems() {
     if (invoices) {
       return invoices.map((invoice) => (
@@ -72,11 +40,22 @@ export function DashboardTable() {
       ));
     }
   }
+  const params = useSearchParams();
+  useEffect(() => {
+    alert("ff");
+  }, []);
+
   return (
     <>
       <h1 className="font-bold">Created Notes</h1>
       <div className="flex w-full justify-end">
-        <Button className="bg-[#e9e9e9] text-black hover:bg-[#e9e9e9]/35">
+        <Button
+          onClick={() => {
+            setShowCreateNotesModal(true);
+          }}
+          style={{ backgroundColor: Colors.applePrimary }}
+          className=""
+        >
           <Plus />
           New
         </Button>
@@ -91,6 +70,46 @@ export function DashboardTable() {
         </TableHeader>
         <TableBody>{renderItems()}</TableBody>
       </Table>
+
+      {/* Dialogs */}
+      <Dialog
+        open={showCreateNotesModal}
+        onOpenChange={setShowCreateNotesModal}
+      >
+        <form>
+          <DialogContent className="max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle>Create a new note</DialogTitle>
+              <DialogDescription>
+                Choose a name of your choice to uniquely identify your notes.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div className="grid gap-1">
+                <Label>Name</Label>
+                <Input
+                  autoComplete="off"
+                  name="name"
+                  placeholder="My Notes 1"
+                  className="placeholder:text-sm"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button
+                style={{ backgroundColor: Colors.applePrimary }}
+                type="submit"
+                className=""
+              >
+                Save changes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </>
   );
 }

@@ -38,7 +38,7 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
           navigation.push("/dashboard");
         }
       }
-      setProcessing(false);
+      // setProcessing(false);
     } catch (e) {
       console.error(e);
       setProcessing(false);
@@ -103,6 +103,7 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
             <Input
               onChange={handleInputChange}
               name="email"
+              autoComplete="email"
               placeholder="Email"
               className="py-5"
             />

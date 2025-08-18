@@ -25,7 +25,6 @@ export default function Logout() {
         }
       } catch (e) {
         setLoading(false);
-        console.error(e);
       }
     }
     logOut();

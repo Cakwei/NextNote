@@ -12,7 +12,7 @@ export default async function Dashboard() {
       <Suspense
         fallback={
           <Skeleton className="w-full h-dvh justify-center flex items-center">
-            Loading Editor...
+            Loading Components...
           </Skeleton>
         }
       >

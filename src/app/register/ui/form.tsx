@@ -38,7 +38,6 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
 
       setProcessing(false);
     } catch (e) {
-      console.error(e);
       setProcessing(false);
     }
   }

@@ -1,5 +1,8 @@
 import mysql from "mysql2/promise";
 
+if (!process.env.NEXT_PUBLIC_DEPLOYMENT_MODE)
+  throw Error("NEXT_PUBLIC_DEPLOYMENT_MODE is not set in .env");
+
 export const pool = mysql.createPool(
   process.env.NEXT_PUBLIC_DEPLOYMENT_MODE === "prod"
     ? {
