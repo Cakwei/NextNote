@@ -721,7 +721,11 @@ const CellSelectKeymap = Extension.create({
     };
   },
 });
-export const Note = () => {
+export const Note = ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,

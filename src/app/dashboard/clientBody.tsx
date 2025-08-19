@@ -40,10 +40,6 @@ export function DashboardTable() {
       ));
     }
   }
-  const params = useSearchParams();
-  useEffect(() => {
-    alert("ff");
-  }, []);
 
   return (
     <>
