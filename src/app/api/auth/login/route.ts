@@ -7,6 +7,7 @@ import { signToken } from "@/lib/jwt";
 export async function POST(req: NextRequest) {
   try {
     const { email, password }: { [key: string]: string } = await req.json();
+
     if (
       // Check input are string, also check if empty
       (typeof email !== "string" || typeof password !== "string") &&

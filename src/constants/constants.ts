@@ -1,5 +1,12 @@
-import { LogOut, LucideIcon, NotebookIcon, User } from "lucide-react";
-import { HTMLProps } from "react";
+import { LoginAccount, RegisterAccount } from "@/types/types";
+import {
+  LayoutDashboard,
+  LogOut,
+  LucideIcon,
+  NotebookIcon,
+  User,
+} from "lucide-react";
+import { FormEvent, HTMLProps } from "react";
 
 export const Colors = {
   applePrimary: "#0066cc",
@@ -71,6 +78,12 @@ type SideBarLinks = {
 }[];
 
 export const sideBarLinks: SideBarLinks = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    className: "",
+  },
   { title: "Profile", url: "/profile", icon: User, className: "" },
   {
     title: "Logout",
@@ -132,3 +145,23 @@ export const invoices = [
     paymentMethod: "Credit Card",
   },
 ];
+
+// AuthProvider.tsx
+export type IUser = {
+  email: string | null;
+};
+
+export type AuthProviderProps = {
+  user: { email: string | null } | null;
+  token: string | null;
+  register: (
+    e: FormEvent<HTMLFormElement>,
+    formData: RegisterAccount
+  ) => Promise<void>;
+  login: (
+    e: FormEvent<HTMLFormElement>,
+    formData: LoginAccount
+  ) => Promise<void>;
+  logout: () => Promise<void>;
+  loading: boolean;
+};

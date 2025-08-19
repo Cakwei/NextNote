@@ -1,49 +1,21 @@
 "use client";
 
-import { apiEndpoint, Colors } from "@/constants/constants";
+import { Colors } from "@/constants/constants";
 import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
-import { axiosResponse, LoginAccount } from "@/types/types";
+import { ChangeEvent, ReactNode, useState } from "react";
+import { LoginAccount } from "@/types/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { z } from "zod";
-import axios from "axios";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export default function LoginForm({ children }: { children?: ReactNode }) {
   const navigation = useRouter();
-  const [processing, setProcessing] = useState(false);
+  const { login, loading } = useAuth();
   const [formData, setFormData] = useState<LoginAccount>({
     email: "",
     password: "",
   });
-
-  async function login(e: FormEvent<HTMLFormElement>) {
-    try {
-      e.preventDefault();
-      setProcessing(true);
-      const isEmail = z.email().parse(formData.email);
-      const isPasswordString = z.string().parse(formData.password);
-      if (isEmail && isPasswordString) {
-        const result: axiosResponse = await axios.post(
-          apiEndpoint.login,
-          {
-            email: formData.email,
-            password: formData.password,
-          },
-          { withCredentials: true }
-        );
-
-        if (result.data.status === "Success") {
-          navigation.push("/dashboard");
-        }
-      }
-      // setProcessing(false);
-    } catch (e) {
-      console.error(e);
-      setProcessing(false);
-    }
-  }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -57,7 +29,7 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
   return (
     <>
       <form
-        onSubmit={login}
+        onSubmit={(e) => login(e, formData)}
         className="h-full sm:h-auto lg:rounded-2xl flex p-5 flex-col min-w-[100px] w-full lg:max-w-[450px] lg:drop-shadow-xl lg:shadow-accent bg-white"
       >
         {/* Title 
@@ -128,11 +100,11 @@ export default function LoginForm({ children }: { children?: ReactNode }) {
             </label>
             <Button
               type="submit"
-              disabled={processing}
+              disabled={loading}
               className={`bg-[#0066cc] hover:bg-[#0066cc]/75 py-5 text-md  ${appleFont.className}`}
               title="Press to attempt login"
             >
-              {processing ? "Logging in..." : "Login"}
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </div>
         </div>

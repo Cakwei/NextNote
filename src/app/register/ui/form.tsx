@@ -1,46 +1,21 @@
 "use client";
 
-import { apiEndpoint, Colors } from "@/constants/constants";
+import { Colors } from "@/constants/constants";
 import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { axiosResponse, RegisterAccount } from "@/types/types";
-import axios from "axios";
-import z from "zod";
+import { RegisterAccount } from "@/types/types";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export default function RegisterForm({ children }: { children?: ReactNode }) {
   const navigation = useRouter();
-  const [processing, setProcessing] = useState(false);
+  const { register, loading } = useAuth();
   const [formData, setFormData] = useState<RegisterAccount>({
     email: "",
     password: "",
   });
-
-  async function register(e: FormEvent<HTMLFormElement>) {
-    try {
-      e.preventDefault();
-      setProcessing(true);
-      const isEmail = z.email().parse(formData.email);
-      const isPasswordString = z.string().parse(formData.password);
-
-      if (isEmail && isPasswordString) {
-        const results: axiosResponse = await axios.post(apiEndpoint.register, {
-          email: formData.email,
-          password: formData.password,
-        });
-
-        if (results.data.status === "Success") {
-          navigation.push("/login");
-        }
-      }
-
-      setProcessing(false);
-    } catch (e) {
-      setProcessing(false);
-    }
-  }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -54,7 +29,7 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
   return (
     <>
       <form
-        onSubmit={register}
+        onSubmit={(e) => register(e, formData)}
         className="h-full sm:h-auto lg:rounded-2xl flex p-5 flex-col min-w-[100px] w-full lg:max-w-[450px] lg:drop-shadow-xl lg:shadow-accent bg-white"
       >
         {/* Title 
@@ -126,7 +101,7 @@ export default function RegisterForm({ children }: { children?: ReactNode }) {
               className={`bg-[#0066cc] hover:bg-[#0066cc]/75 py-5 text-md  ${appleFont.className}`}
               title="Press to attempt login"
             >
-              {processing ? "Registering..." : "Register"}
+              {loading ? "Registering..." : "Register"}
             </Button>
           </div>
         </div>

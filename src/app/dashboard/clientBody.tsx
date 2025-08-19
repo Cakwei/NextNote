@@ -21,18 +21,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Colors, invoices } from "@/constants/constants";
-import { INotes } from "@/types/types";
+import { axiosResponse, INotes } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 export function DashboardTable() {
   const [notes, setNotes] = useState<INotes[]>([]);
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
+  const query = useQuery({
+    queryKey: ["notes"],
+    queryFn: createNoteInDatabase,
+  });
+
   function renderItems() {
     if (invoices) {
-      return invoices.map((invoice) => (
+      return (query.data || invoices).map((invoice) => (
         <TableRow key={invoice.invoice}>
           <TableCell className="font-medium">{invoice.invoice}</TableCell>
           <TableCell className="text-right">{invoice.totalAmount}</TableCell>
@@ -40,11 +46,35 @@ export function DashboardTable() {
       ));
     }
   }
+  async function fetchNotesFromDatabase() {
+    const response: axiosResponse = await axios.get(`api/notes/123`, {
+      withCredentials: true,
+    });
+
+    if (response.data.code === 200) {
+    }
+  }
+
+  async function createNoteInDatabase() {
+    const response: axiosResponse = await axios.post(`api/notes/123`, {
+      withCredentials: true,
+    });
+    if (response.data.code === 201) {
+    }
+  }
 
   return (
     <>
       <h1 className="font-bold">Created Notes</h1>
       <div className="flex w-full justify-end">
+        <Button
+          onClick={fetchNotesFromDatabase}
+          style={{ backgroundColor: Colors.applePrimary }}
+          className=""
+        >
+          <Plus />
+          Test
+        </Button>
         <Button
           onClick={() => {
             setShowCreateNotesModal(true);
@@ -96,6 +126,7 @@ export function DashboardTable() {
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
               <Button
+                onClick={createNoteInDatabase}
                 style={{ backgroundColor: Colors.applePrimary }}
                 type="submit"
                 className=""

@@ -3,6 +3,8 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { appleFont } from "@/lib/fonts";
 import { metadataDescription, metadataInfo } from "@/constants/constants";
+import QueryProvider from "@/contexts/QueryProvider";
+import { AuthProvider } from "@/contexts/AuthProvider";
 
 export const metadata: Metadata = {
   title: metadataInfo.default,
@@ -17,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${appleFont.className} antialiased`}>
-        {children}
-        <Toaster />
+        <AuthProvider>
+          <QueryProvider>{children}</QueryProvider>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
