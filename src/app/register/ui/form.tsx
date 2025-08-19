@@ -3,7 +3,7 @@
 import { Colors } from "@/constants/constants";
 import { appleFont } from "@/lib/fonts";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RegisterAccount } from "@/types/types";

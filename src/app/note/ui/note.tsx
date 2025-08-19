@@ -722,6 +722,7 @@ const CellSelectKeymap = Extension.create({
   },
 });
 export const Note = ({
+  // eslint-disable-next-line
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };

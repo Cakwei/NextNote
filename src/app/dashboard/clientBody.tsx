@@ -21,15 +21,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Colors, invoices } from "@/constants/constants";
-import { axiosResponse, INotes } from "@/types/types";
+import { axiosResponse } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { MouseEventHandler, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 export function DashboardTable() {
-  const [notes, setNotes] = useState<INotes[]>([]);
+  // const [notes, setNotes] = useState<INotes[]>([]);
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
   const query = useQuery({
     queryKey: ["notes"],

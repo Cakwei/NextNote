@@ -23,9 +23,11 @@ const AuthContext = createContext<AuthProviderProps>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // eslint-disable-next-line
   const [user, setUser] = useState<IUser>({
     email: null,
   });
+  // eslint-disable-next-line
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigation = useRouter();
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setLoading(false);
-    } catch (e) {
+    } catch {
       setLoading(false);
     }
   }

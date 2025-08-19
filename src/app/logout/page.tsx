@@ -23,7 +23,7 @@ export default function Logout() {
           setLoading(false);
           setTimeout(() => navigation.push("/login"), 500);
         }
-      } catch (e) {
+      } catch {
         setLoading(false);
       }
     }

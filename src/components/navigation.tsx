@@ -19,7 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import Link from "next/link";
-import { BookOpenCheck, ChevronDownIcon, Icon, Paperclip } from "lucide-react"; // Import a chevron icon
+import {  ChevronDownIcon, Paperclip } from "lucide-react"; // Import a chevron icon
 import { fakeNotesArray, sideBarLinks } from "@/constants/constants";
 
 export function DashboardSidebar() {
