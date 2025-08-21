@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
 
       const uuid = uuidv4();
 
+      // eslint-disable-next-line
       [result, field] = await pool.execute(
         "INSERT INTO notes (noteId, accountId, title) VALUES (?, ?, ?)",
         [uuid, (result as unknown as RowDataPacket[])[0].accountId, title]

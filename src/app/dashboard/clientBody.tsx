@@ -24,7 +24,7 @@ import { Colors, invoices } from "@/constants/constants";
 import { axiosResponse } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -49,6 +49,7 @@ export function DashboardTable() {
       ));
     }
   }
+  /*
   async function fetchNotesFromDatabase() {
     const response: axiosResponse = await axios.get(`api/notes/123`, {
       withCredentials: true,
@@ -57,6 +58,7 @@ export function DashboardTable() {
     if (response.data.code === 200) {
     }
   }
+  */
 
   async function createNoteInDatabase() {
     const response: axiosResponse = await axios.post(
