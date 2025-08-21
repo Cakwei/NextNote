@@ -59,6 +59,7 @@ export function DashboardTable() {
     const response: axiosResponse = await axios.post(`api/notes`, {
       withCredentials: true,
     });
+    console.log(response)
     if (response.data.code === 201) {
     }
   }
