@@ -56,7 +56,7 @@ export function DashboardTable() {
   }
 
   async function createNoteInDatabase() {
-    const response: axiosResponse = await axios.post(`api/notes/123`, {
+    const response: axiosResponse = await axios.post(`api/notes`, {
       withCredentials: true,
     });
     if (response.data.code === 201) {
@@ -67,14 +67,6 @@ export function DashboardTable() {
     <>
       <h1 className="font-bold">Created Notes</h1>
       <div className="flex w-full justify-end">
-        <Button
-          onClick={fetchNotesFromDatabase}
-          style={{ backgroundColor: Colors.applePrimary }}
-          className=""
-        >
-          <Plus />
-          Test
-        </Button>
         <Button
           onClick={() => {
             setShowCreateNotesModal(true);
