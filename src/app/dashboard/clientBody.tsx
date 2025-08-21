@@ -24,7 +24,7 @@ import { Colors, invoices } from "@/constants/constants";
 import { axiosResponse } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -34,6 +34,9 @@ export function DashboardTable() {
   const query = useQuery({
     queryKey: ["notes"],
     queryFn: createNoteInDatabase,
+  });
+  const [formData, setFormData] = useState({
+    title: null,
   });
 
   function renderItems() {
@@ -56,12 +59,21 @@ export function DashboardTable() {
   }
 
   async function createNoteInDatabase() {
-    const response: axiosResponse = await axios.post(`api/notes`, {
-      withCredentials: true,
-    });
-    console.log(response)
+    const response: axiosResponse = await axios.post(
+      `api/notes`,
+      { title: formData.title },
+      {
+        withCredentials: true,
+      }
+    );
     if (response.data.code === 201) {
+      console.log(response);
     }
+  }
+
+  function handleInput(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   return (
@@ -107,8 +119,9 @@ export function DashboardTable() {
               <div className="grid gap-1">
                 <Label>Name</Label>
                 <Input
+                  onChange={handleInput}
                   autoComplete="off"
-                  name="name"
+                  name="title"
                   placeholder="My Notes 1"
                   className="placeholder:text-sm"
                 />

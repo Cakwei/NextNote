@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 21, 2025 at 08:58 AM
--- Server version: 8.3.0
--- PHP Version: 8.3.6
+-- Generation Time: Aug 21, 2025 at 02:57 PM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
   `data` blob,
   `creationDate` datetime DEFAULT CURRENT_TIMESTAMP,
   `modifiedDate` datetime DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`noteId`),
   UNIQUE KEY `accountId` (`accountId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

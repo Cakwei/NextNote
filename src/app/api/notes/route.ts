@@ -1,39 +1,61 @@
 import { pool } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
-import {
-  FieldPacket,
-  QueryResult,
-  ResultSetHeader,
-  RowDataPacket,
-} from "mysql2/promise";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
+import { findUserByEmail } from "../auth/register/route";
 
 export async function POST(req: NextRequest) {
-  let cookie = req.cookies.get("auth")?.value;
+  try {
+    let cookie = req.cookies.get("auth")?.value;
+    const { title } = await req.json();
 
-  if (cookie) {
-    cookie = await verifyToken(cookie);
+    if (cookie) {
+      cookie = await verifyToken(cookie);
 
-    // If cookie cannot be verified
-    if (!cookie) {
+      // If cookie cannot be verified
+      if (!cookie) {
+        return NextResponse.json(
+          { status: "Error", data: {}, message: "Cookie is invalid" },
+          { status: 201 }
+        );
+      }
+
+      if (!title) {
+        return NextResponse.json(
+          { status: "Error", data: {}, message: "Note title is not given" },
+          { status: 409 }
+        );
+      }
+
+      cookie = JSON.parse(cookie).email;
+
+      // If cookie can be verified,
+      // search for user then create new note
+      let [result, field]: [RowDataPacket[] | ResultSetHeader, FieldPacket[]] =
+        await findUserByEmail(cookie || "");
+
+      const uuid = uuidv4();
+
+      [result, field] = await pool.execute(
+        "INSERT INTO notes (noteId, accountId, title) VALUES (?, ?, ?)",
+        [uuid, (result as unknown as RowDataPacket[])[0].accountId, title]
+      );
       return NextResponse.json(
-        { status: "Error", data: {}, message: "Cookie is invalid" },
+        {
+          status: "Sucess",
+          data: {},
+          message: "Successfully created note",
+        },
         { status: 201 }
       );
     }
-
-    cookie = JSON.parse(cookie);
-
-    // If cookie can be verified,
-    // search for user then create new note
-    let [result, field]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-      "SELECT * FROM accounts notes WHERE email = ?",
-      [cookie]
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json(
+      { status: "Error", data: {}, message: "Error creating note" },
+      { status: 500 }
     );
-
-    const uuid = uuidv4();
-    [result, field] = await pool.execute("INSERT INTO notes VALUES ()", []);
   }
 }
 

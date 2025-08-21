@@ -55,7 +55,7 @@ async function register(email: string, password: string) {
 }
 
 // Quick Functions
-async function findUserByEmail(email: string) {
+export async function findUserByEmail(email: string) {
   const [results, fields] = await pool.execute(
     "SELECT * FROM accounts WHERE email = ?",
     [email]
