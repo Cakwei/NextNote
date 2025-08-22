@@ -9,6 +9,7 @@ import {
   FormEvent,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import z from "zod";
@@ -76,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           { withCredentials: true }
         );
         if (result.data.status === "Success") {
+          setUser({ email: result.data.data.email });
           navigation.push("/dashboard");
         }
       }
@@ -93,6 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log(err);
     }
   }
+
+  async function refreshSession() {}
 
   return (
     <AuthContext value={{ user, token, loading, register, login, logout }}>

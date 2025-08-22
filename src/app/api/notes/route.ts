@@ -1,9 +1,13 @@
 import { pool } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import {
+  FieldPacket,
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2/promise";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { findUserByEmail } from "../auth/register/route";
+import { findUserByEmail } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,8 +48,8 @@ export async function POST(req: NextRequest) {
       );
       return NextResponse.json(
         {
-          status: "Sucess",
-          data: {},
+          status: "Success",
+          data: { noteId: uuid },
           message: "Successfully created note",
         },
         { status: 201 }

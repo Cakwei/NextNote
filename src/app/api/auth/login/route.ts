@@ -55,7 +55,7 @@ async function login(email: string, password: string) {
 
     return {
       status: "Success",
-      data: token,
+      data: { token: token, email: email },
       message: "Logged in successfully",
       code: 200,
     };

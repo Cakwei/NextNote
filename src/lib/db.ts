@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise";
+import mysql, { FieldPacket, ResultSetHeader } from "mysql2/promise";
 
 if (!process.env.NEXT_PUBLIC_DEPLOYMENT_MODE)
   throw Error("NEXT_PUBLIC_DEPLOYMENT_MODE is not set in .env");
@@ -28,3 +28,12 @@ export const pool = mysql.createPool(
         keepAliveInitialDelay: 0,
       }
 );
+
+// Quick Functions
+export async function findUserByEmail(email: string) {
+  const [results, fields] = await pool.execute(
+    "SELECT * FROM accounts WHERE email = ?",
+    [email]
+  );
+  return [results, fields] as [ResultSetHeader, FieldPacket[]];
+}

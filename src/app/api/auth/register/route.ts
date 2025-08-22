@@ -1,4 +1,4 @@
-import { pool } from "@/lib/db";
+import { findUserByEmail, pool } from "@/lib/db";
 import { FieldPacket, QueryResult, ResultSetHeader } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
@@ -52,13 +52,4 @@ async function register(email: string, password: string) {
     message: "An error occured",
     code: 404,
   };
-}
-
-// Quick Functions
-export async function findUserByEmail(email: string) {
-  const [results, fields] = await pool.execute(
-    "SELECT * FROM accounts WHERE email = ?",
-    [email]
-  );
-  return [results, fields] as [ResultSetHeader, FieldPacket[]];
 }

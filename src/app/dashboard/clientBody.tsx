@@ -20,56 +20,84 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Colors, invoices } from "@/constants/constants";
-import { axiosResponse } from "@/types/types";
+import { Colors } from "@/constants/constants";
+import { axiosResponse, INotes, INotesTableArray } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { ChangeEvent, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export function DashboardTable() {
   // const [notes, setNotes] = useState<INotes[]>([]);
+  const currentPathname = usePathname();
+  const navigation = useRouter();
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
-  const query = useQuery({
+  const queryClient = useQueryClient();
+  const auth = useAuth();
+
+  useEffect(() => console.log(auth.user?.email), [auth.user]);
+  const { data } = useQuery({
     queryKey: ["notes"],
-    queryFn: createNoteInDatabase,
-  });
-  const [formData, setFormData] = useState({
-    title: null,
+    queryFn: fetchNotesFromDatabase,
+    refetchInterval: 10000,
+    // enabled: Boolean(auth && auth.user && auth.user?.email),
   });
 
-  function renderItems() {
-    if (invoices) {
-      return (query.data || invoices).map((invoice) => (
-        <TableRow key={invoice.invoice}>
-          <TableCell className="font-medium">{invoice.invoice}</TableCell>
-          <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+  const [formData, setFormData] = useState<{ title: string }>({
+    title: "",
+  });
+
+  const createNote = useMutation({
+    mutationFn: createNoteInDatabase,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
+  function renderItems(
+    data: string | string[] | INotesTableArray[] | undefined
+  ) {
+    if (data) {
+      return (data as INotesTableArray[]).map((note) => (
+        <TableRow key={note.title}>
+          <TableCell className="">{note.title}</TableCell>
+          <TableCell className="">{note.creationDate}</TableCell>
+          <TableCell className="">{note.modifiedDate}</TableCell>
         </TableRow>
       ));
     }
   }
-  /*
+
   async function fetchNotesFromDatabase() {
-    const response: axiosResponse = await axios.get(`api/notes/123`, {
-      withCredentials: true,
-    });
-
-    if (response.data.code === 200) {
-    }
-  }
-  */
-
-  async function createNoteInDatabase() {
-    const response: axiosResponse = await axios.post(
-      `api/notes`,
-      { title: formData.title },
+    const response: axiosResponse = await axios.get(
+      "api/notes/charleetan2020@gmail.com", //`api/notes/${auth.user?.email}`
       {
         withCredentials: true,
       }
     );
-    if (response.data.code === 201) {
-      console.log(response);
+    if (response.data.status === "Success") {
+      return response.data.data.results;
+    }
+  }
+
+  async function createNoteInDatabase(variable: INotes) {
+    try {
+      const response: axiosResponse = await axios.post(
+        `api/notes`,
+        { title: variable.title },
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.status === "Success") {
+        const { noteId } = response.data.data;
+        navigation.push(`${currentPathname}?=${noteId}`);
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -78,6 +106,7 @@ export function DashboardTable() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
+  useEffect(() => console.log(data), [data]);
   return (
     <>
       <h1 className="font-bold">Created Notes</h1>
@@ -97,11 +126,12 @@ export function DashboardTable() {
         <TableCaption>{"A list of your recent invoices."}</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Notes</TableHead>
-            <TableHead className="text-right">Modified Date</TableHead>
+            <TableHead className="w-[33.3%]">Notes</TableHead>
+            <TableHead className="w-[33.3%]">Creation Date</TableHead>
+            <TableHead className="w-[33.3%]">Modified Date</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>{renderItems()}</TableBody>
+        <TableBody>{renderItems(data)}</TableBody>
       </Table>
 
       {/* Dialogs */}
@@ -134,7 +164,9 @@ export function DashboardTable() {
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
               <Button
-                onClick={createNoteInDatabase}
+                onClick={() => {
+                  createNote.mutate({ title: formData.title });
+                }}
                 style={{ backgroundColor: Colors.applePrimary }}
                 type="submit"
                 className=""
