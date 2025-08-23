@@ -27,19 +27,31 @@ import { Plus } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardTable() {
   // const [notes, setNotes] = useState<INotes[]>([]);
-  const currentPathname = usePathname();
   const navigation = useRouter();
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
   const queryClient = useQueryClient();
-  const auth = useAuth();
+  const numberOfRows = 3;
 
-  useEffect(() => console.log(auth.user?.email), [auth.user]);
-  const { data } = useQuery({
+  const skeletonRows = [...Array(numberOfRows)].map((_, index) => (
+    <TableRow key={index}>
+      <TableCell>
+        <Skeleton className="h-[36.5px]" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-[36.5px]" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-[36.5px]" />
+      </TableCell>
+    </TableRow>
+  ));
+
+  const { data, isLoading } = useQuery({
     queryKey: ["notes"],
     queryFn: fetchNotesFromDatabase,
     refetchInterval: 10000,
@@ -94,7 +106,7 @@ export function DashboardTable() {
       );
       if (response.data.status === "Success") {
         const { noteId } = response.data.data;
-        navigation.push(`${currentPathname}?=${noteId}`);
+        navigation.push(`/note?=${noteId}`);
       }
     } catch (err) {
       console.log(err);
@@ -122,8 +134,8 @@ export function DashboardTable() {
           New
         </Button>
       </div>
-      <Table>
-        <TableCaption>{"A list of your recent invoices."}</TableCaption>
+      <Table className="relative">
+        <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[33.3%]">Notes</TableHead>
@@ -131,7 +143,7 @@ export function DashboardTable() {
             <TableHead className="w-[33.3%]">Modified Date</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>{renderItems(data)}</TableBody>
+        <TableBody>{isLoading ? skeletonRows : renderItems(data)}</TableBody>
       </Table>
 
       {/* Dialogs */}

@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ email: string }> }
 ) {
   try {
-    const email = (await params).email;
+    const emailParam = (await params).email;
     let cookie = req.cookies.get("auth")?.value;
 
     if (cookie) {
@@ -24,22 +24,32 @@ export async function GET(
 
       const email = JSON.parse(cookie).email;
 
-      const [results]: [RowDataPacket[] | ResultSetHeader, FieldPacket[]] =
-        (await pool.execute(
-          "SELECT noteId, creationDate, title, data, modifiedDate FROM accounts LEFT JOIN notes ON accounts.accountId = notes.accountId WHERE email = ?",
-          [email]
-        )) as [RowDataPacket[], FieldPacket[]];
+      if (email && emailParam) {
+        const [results]: [RowDataPacket[] | ResultSetHeader, FieldPacket[]] =
+          (await pool.execute(
+            "SELECT noteId, creationDate, title, data, modifiedDate FROM accounts LEFT JOIN notes ON accounts.accountId = notes.accountId WHERE email = ?",
+            [email]
+          )) as [RowDataPacket[], FieldPacket[]];
 
-      if (results.length > 0) {
-        return NextResponse.json(
-          {
-            status: "Success",
-            data: { results: results },
-            message: "Found notes attached to account",
-          },
-          { status: 200 }
-        );
+        if (results.length > 0) {
+          return NextResponse.json(
+            {
+              status: "Success",
+              data: { results: results },
+              message: "Found notes attached to account",
+            },
+            { status: 200 }
+          );
+        }
       }
+      return NextResponse.json(
+        {
+          status: "Error",
+          data: {},
+          message: "Parameter does not match email",
+        },
+        { status: 200 }
+      );
     }
   } catch (err) {
     console.log(err);

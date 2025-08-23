@@ -24,7 +24,6 @@ const AuthContext = createContext<AuthProviderProps>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // eslint-disable-next-line
   const [user, setUser] = useState<IUser>({
     email: null,
   });
@@ -77,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           { withCredentials: true }
         );
         if (result.data.status === "Success") {
-          setUser({ email: result.data.data.email });
+          setUser({ email: result.data.data.email as string });
           navigation.push("/dashboard");
         }
       }
@@ -96,7 +95,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function refreshSession() {}
+  useEffect(() => {
+    async function refreshSession() {
+      const result: axiosResponse = await axios.post(
+        apiEndpoint.login,
+        {},
+        { withCredentials: true }
+      );
+      if (result.data.status === "Success") {
+        console.log(result.data);
+        setUser({ email: result.data.data.email as string });
+      }
+    }
+    refreshSession();
+  }, []);
 
   return (
     <AuthContext value={{ user, token, loading, register, login, logout }}>

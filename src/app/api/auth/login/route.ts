@@ -2,12 +2,31 @@ import { pool } from "@/lib/db";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { signToken } from "@/lib/jwt";
+import { signToken, verifyToken } from "@/lib/jwt";
 
 export async function POST(req: NextRequest) {
   try {
     const { email, password }: { [key: string]: string } = await req.json();
+    let cookie = req.cookies.get("auth")?.value;
 
+    // If cookie is present
+    if (cookie) {
+      cookie = await verifyToken(cookie);
+      const email = JSON.parse(cookie || "");
+
+      if (cookie && email) {
+        return NextResponse.json(
+          {
+            status: "Success",
+            data: { email: email },
+            message: "Logged in successfully",
+          },
+          { status: 200 }
+        );
+      }
+    }
+
+    // If cookie is absent
     if (
       // Check input are string, also check if empty
       (typeof email !== "string" || typeof password !== "string") &&
@@ -30,7 +49,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function login(email: string, password: string) {
+async function login(email?: string, password?: string) {
   const [results]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
     "SELECT * FROM accounts WHERE email = ? AND password = ?",
     [email, password]
