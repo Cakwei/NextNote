@@ -29,6 +29,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export function DashboardTable() {
   // const [notes, setNotes] = useState<INotes[]>([]);
@@ -75,7 +76,11 @@ export function DashboardTable() {
     if (data) {
       return (data as INotesTableArray[]).map((note) => (
         <TableRow key={note.title}>
-          <TableCell className="">{note.title}</TableCell>
+          <TableCell className="">
+            <Link className="hover:underline" href={`note?id=${note.noteId}`}>
+              {note.title}
+            </Link>
+          </TableCell>
           <TableCell className="">{note.creationDate}</TableCell>
           <TableCell className="">{note.modifiedDate}</TableCell>
         </TableRow>
@@ -128,7 +133,7 @@ export function DashboardTable() {
             setShowCreateNotesModal(true);
           }}
           style={{ backgroundColor: Colors.applePrimary }}
-          className=""
+          className={`hover:opacity-75`}
         >
           <Plus />
           New
@@ -181,7 +186,7 @@ export function DashboardTable() {
                 }}
                 style={{ backgroundColor: Colors.applePrimary }}
                 type="submit"
-                className=""
+                className={`hover:opacity-75`}
               >
                 Save changes
               </Button>

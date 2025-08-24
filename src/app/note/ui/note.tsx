@@ -83,6 +83,10 @@ import {
   Save,
   Undo,
 } from "lucide-react";
+import axios from "axios";
+import { useAuth } from "@/contexts/AuthProvider";
+import { axiosResponse } from "@/types/types";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface ToolbarProps {
   editor: TipTapEditor | null;
@@ -102,6 +106,8 @@ declare module "@tiptap/core" {
   }
 }
 const Toolbar: FC<ToolbarProps> = ({ editor }) => {
+  const params = useSearchParams();
+  const auth = useAuth();
   // eslint-disable-next-line
   const [fontSearch, setFontSearch] = useState("");
   const filteredFonts = fontFamilies.filter((font) =>
@@ -218,6 +224,18 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
       editor.chain().focus().setCellAttribute("backgroundColor", color).run();
     }
   };
+
+  async function saveToDatabase() {
+    const noteId = params.get("id");
+    const response: axiosResponse = await axios.patch(
+      `api/notes/${auth.user?.email}`,
+      { noteData: editor?.getJSON(), noteId: noteId },
+      { withCredentials: true }
+    );
+    if (response.data.status === "Success") {
+      console.log("Note updated");
+    }
+  }
 
   const exportJSONFormat = () => {
     const blob = new Blob([JSON.stringify(editor?.getJSON())], {
@@ -588,7 +606,7 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
       </Dialog>
 
       <button
-        onClick={exportJSONFormat}
+        onClick={saveToDatabase} //{exportJSONFormat}
         className="p-2 rounded-md hover:bg-gray-100"
         title="Save"
       >

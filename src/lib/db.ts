@@ -1,4 +1,8 @@
-import mysql, { FieldPacket, ResultSetHeader } from "mysql2/promise";
+import mysql, {
+  FieldPacket,
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2/promise";
 
 if (!process.env.NEXT_PUBLIC_DEPLOYMENT_MODE)
   throw Error("NEXT_PUBLIC_DEPLOYMENT_MODE is not set in .env");
@@ -35,5 +39,5 @@ export async function findUserByEmail(email: string) {
     "SELECT * FROM accounts WHERE email = ?",
     [email]
   );
-  return [results, fields] as [ResultSetHeader, FieldPacket[]];
+  return [results, fields] as [RowDataPacket[], FieldPacket[]];
 }

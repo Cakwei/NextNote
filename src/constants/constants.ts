@@ -20,7 +20,7 @@ export const apiEndpoint = {
   logout: "api/auth/logout",
 };
 
-export const protectedRoutes = ["/dashboard"];
+export const protectedRoutes = ["/dashboard", "/note"];
 
 export const unprotectedRoutes = ["/Login", "/register"];
 

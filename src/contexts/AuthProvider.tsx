@@ -103,7 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { withCredentials: true }
       );
       if (result.data.status === "Success") {
-        console.log(result.data);
         setUser({ email: result.data.data.email as string });
       }
     }
