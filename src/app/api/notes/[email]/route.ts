@@ -8,6 +8,7 @@ import {
 } from "mysql2/promise";
 import { NextRequest, NextResponse } from "next/server";
 
+// Fetch all note based on email address
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ email: string }> }
@@ -61,15 +62,17 @@ export async function GET(
   }
 }
 
+// Updates note data
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ email: string }> }
+  { params }: { params: Promise<{ title: string; email: string }> }
 ) {
   try {
     let cookie = req.cookies.get("auth")?.value;
     const body: {
       noteData: { type: string; content: object[] };
       noteId: string;
+      noteTitle: string;
     } = await req.json();
     const emailParams = (await params).email;
 
@@ -86,16 +89,16 @@ export async function PATCH(
 
       const email = JSON.parse(cookie).email;
 
-      if (email && body && emailParams) {
+      if (email && body && emailParams === email) {
         let [results]: [QueryResult, FieldPacket[]] = await findUserByEmail(
           email
         );
 
         [results] = (await pool.execute(
-          "UPDATE notes SET data = ?, modifiedDate = NOW() WHERE accountId = ? AND noteId = ?",
-          [body.noteData, results[0].accountId, body.noteId]
+          "UPDATE notes SET data = ?, title = ?, modifiedDate = NOW() WHERE accountId = ? AND noteId = ?",
+          [body.noteData, body.noteTitle, results[0].accountId, body.noteId]
         )) as [ResultSetHeader, FieldPacket[]];
-
+        console.log(body.noteData);
         if (results.affectedRows > 0) {
           return NextResponse.json(
             {
@@ -122,8 +125,8 @@ export async function PATCH(
   }
 }
 
-async function updateNoteDataInDB() {
-  const [results, fields] = await pool.execute("", []);
-}
+// async function updateNoteDataInDB() {
+//   const [results, fields] = await pool.execute("", []);
+// }
 
 // export async function GET(request: NextRequest) {}

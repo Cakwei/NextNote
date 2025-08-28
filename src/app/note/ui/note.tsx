@@ -21,12 +21,14 @@ import TaskItem from "@tiptap/extension-task-item";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import FontFamily from "@tiptap/extension-font-family";
+import Bold from "@tiptap/extension-bold";
 import Blockquote from "@tiptap/extension-blockquote";
 import CodeBlock from "@tiptap/extension-code-block";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { findParentNodeOfType } from "prosemirror-utils";
+import { BulletList, ListItem } from "@tiptap/extension-list";
 import {
-  Bold,
+  Bold as BoldIcon,
   Italic,
   Underline as LucideUnderline,
   Strikethrough,
@@ -86,10 +88,12 @@ import {
 import axios from "axios";
 import { useAuth } from "@/contexts/AuthProvider";
 import { axiosResponse } from "@/types/types";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 interface ToolbarProps {
   editor: TipTapEditor | null;
+  noteTitle: string;
 }
 
 declare module "@tiptap/core" {
@@ -105,7 +109,7 @@ declare module "@tiptap/core" {
     };
   }
 }
-const Toolbar: FC<ToolbarProps> = ({ editor }) => {
+const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle }) => {
   const params = useSearchParams();
   const auth = useAuth();
   // eslint-disable-next-line
@@ -229,14 +233,14 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
     const noteId = params.get("id");
     const response: axiosResponse = await axios.patch(
       `api/notes/${auth.user?.email}`,
-      { noteData: editor?.getJSON(), noteId: noteId },
+      { noteData: editor?.getJSON(), noteId: noteId, noteTitle: noteTitle },
       { withCredentials: true }
     );
     if (response.data.status === "Success") {
       console.log("Note updated");
     }
   }
-
+  /*
   const exportJSONFormat = () => {
     const blob = new Blob([JSON.stringify(editor?.getJSON())], {
       type: "application/json",
@@ -248,6 +252,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
     a.click();
     URL.revokeObjectURL(url);
   };
+  */
   const isTableActive = editor.isActive("table");
 
   return (
@@ -259,7 +264,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor }) => {
         }`}
         title="Bold"
       >
-        <Bold size={16} />
+        <BoldIcon size={16} />
       </button>
 
       <button
@@ -739,23 +744,26 @@ const CellSelectKeymap = Extension.create({
     };
   },
 });
-export const Note = ({
-  // eslint-disable-next-line
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+export const Note = () => {
+  const auth = useAuth();
+  const query = useQuery({
+    queryKey: ["todos"],
+    queryFn: fetchNoteData,
+    enabled: Boolean(auth.user?.email),
+  });
+  const [noteTitle, setNoteTitle] = useState("");
+
+  useEffect(() => {
+    setNoteTitle(query.data?.title as string);
+    editor?.commands.setContent(query.data?.data as string);
+  }, [query.data]);
+
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit.configure({
-        bulletList: { keepMarks: true, keepAttributes: false },
-        orderedList: { keepMarks: true, keepAttributes: false },
-        blockquote: false,
-        codeBlock: false,
-        horizontalRule: false,
-      }),
+      StarterKit,
+      Bold,
       Blockquote,
       CodeBlock,
       HorizontalRule,
@@ -763,6 +771,8 @@ export const Note = ({
       Color,
       FontSize,
       Underline,
+      BulletList.configure({ keepMarks: true, keepAttributes: false }),
+      ListItem,
       ResizableImage.configure({ inline: true }),
       Table.configure({ resizable: true }),
       TableRow,
@@ -827,21 +837,19 @@ export const Note = ({
     },
   });
 
-  useEffect(() => {
-    if (!editor) return;
-    const handleUpdate = () => {
-      setHasClipboardContent(true);
-    };
-    editor.on("transaction", handleUpdate);
-    return () => {
-      editor.off("transaction", handleUpdate);
-    };
-  }, [editor]);
   const hasSelectedText = () => {
     if (!editor) return false;
     const { from, to } = editor.state.selection;
     return from !== to;
   };
+
+  async function fetchNoteData() {
+    const response = (await axios.get(`api/notes`, {
+      params: { email: auth.user?.email },
+      withCredentials: true,
+    })) as axiosResponse;
+    return response.data.data || null;
+  }
 
   const isImageActive = () => {
     if (!editor) return false;
@@ -952,21 +960,31 @@ export const Note = ({
       return;
     }
   };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     checkClipboardContent();
   };
+
+  function handleInput(e: ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    setNoteTitle(() => value);
+  }
+
   return (
     <div className="flex w-full h-dvh flex-col gap-5">
       <header className="flex items-center justify-between p-4 shadow-md rounded-lg m-0">
         <Input
+          onChange={handleInput}
+          name="Title"
+          value={noteTitle}
           placeholder="Untitled Note"
           className="font-bold text-gray-800 border-none outline-none text-xl"
         />
       </header>
       <div className="w-full flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow-md mb-0.5 ml-0.5">
         <div className="sticky top-0 bg-white">
-          <Toolbar editor={editor} />
+          <Toolbar editor={editor} noteTitle={noteTitle} />
         </div>
         {/* Modified this div to handle overflow-y-auto */}
         <div

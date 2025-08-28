@@ -30,9 +30,11 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export function DashboardTable() {
   // const [notes, setNotes] = useState<INotes[]>([]);
+  const auth = useAuth();
   const navigation = useRouter();
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
   const queryClient = useQueryClient();
@@ -56,7 +58,7 @@ export function DashboardTable() {
     queryKey: ["notes"],
     queryFn: fetchNotesFromDatabase,
     refetchInterval: 10000,
-    // enabled: Boolean(auth && auth.user && auth.user?.email),
+    enabled: Boolean(auth && auth.user && auth.user?.email),
   });
 
   const [formData, setFormData] = useState<{ title: string }>({
@@ -67,6 +69,7 @@ export function DashboardTable() {
     mutationFn: createNoteInDatabase,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      setShowCreateNotesModal(false);
     },
   });
 
@@ -188,7 +191,9 @@ export function DashboardTable() {
                 type="submit"
                 className={`hover:opacity-75`}
               >
-                Save changes
+                {createNote.isPending || createNote.isSuccess
+                  ? "Creating..."
+                  : "Save changes"}
               </Button>
             </DialogFooter>
           </DialogContent>

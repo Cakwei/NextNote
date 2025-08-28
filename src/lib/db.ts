@@ -1,6 +1,5 @@
 import mysql, {
   FieldPacket,
-  ResultSetHeader,
   RowDataPacket,
 } from "mysql2/promise";
 

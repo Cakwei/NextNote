@@ -385,3 +385,11 @@ ul[data-type="taskList"] li > div {
 .thin-scrollbar::-webkit-scrollbar-track {
   background: transparent; /* Makes the scrollbar track transparent */
 }
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
