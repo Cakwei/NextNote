@@ -1,7 +1,7 @@
 import * as jwt from "jose";
 import { JOSEError } from "jose/errors";
 
-export async function signToken(payload: object) {
+export async function signToken(payload: jwt.JWTPayload) {
   try {
     const SECRET_KEY = process.env.JWT_SECRET;
     if (!SECRET_KEY) {
@@ -9,17 +9,16 @@ export async function signToken(payload: object) {
     }
 
     // ==== //
-    const token = await new jwt.CompactSign(
-      new TextEncoder().encode(JSON.stringify(payload))
-    )
-      .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+    const token = await new jwt.SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1h")
       .sign(new TextEncoder().encode(SECRET_KEY));
     return token;
   } catch (e) {
     if (e instanceof JOSEError) {
       console.log("Error signing JWT token @ jwt.ts");
     }
-    return "";
+    return false;
   }
 }
 
@@ -30,19 +29,22 @@ export async function verifyToken(token: string) {
       throw new Error("JWT_SECRET is not defined");
     }
 
+    // If no token is present, return false
+    if (!token) {
+      return;
+    }
+
     // ==== //
-    const { payload } = await jwt.compactVerify(
+    const { payload } = await jwt.jwtVerify(
       token,
       new TextEncoder().encode(SECRET_KEY)
     );
-
-    const decodedPayload = new TextDecoder().decode(payload);
-    return decodedPayload;
+    return JSON.stringify(payload);
   } catch (e) {
     if (e instanceof JOSEError) {
       console.log("Failed to verify token @ jwt.ts");
     }
-    return ;
+    return;
   }
 }
 

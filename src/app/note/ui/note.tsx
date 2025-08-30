@@ -747,15 +747,23 @@ const CellSelectKeymap = Extension.create({
 export const Note = () => {
   const auth = useAuth();
   const query = useQuery({
-    queryKey: ["todos"],
+    queryKey: ["note"],
     queryFn: fetchNoteData,
     enabled: Boolean(auth.user?.email),
+    refetchInterval: false,
   });
   const [noteTitle, setNoteTitle] = useState("");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    setNoteTitle(query.data?.title as string);
-    editor?.commands.setContent(query.data?.data as string);
+    if (query.data?.title) {
+      setNoteTitle(query.data.title as string);
+    }
+
+    // Check if query.data.data exists and is a non-empty object
+    if (query.data?.data && Object.keys(query.data.data).length > 0) {
+      editor?.commands.setContent(query.data.data);
+    }
   }, [query.data]);
 
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
@@ -844,11 +852,16 @@ export const Note = () => {
   };
 
   async function fetchNoteData() {
-    const response = (await axios.get(`api/notes`, {
-      params: { email: auth.user?.email },
-      withCredentials: true,
-    })) as axiosResponse;
-    return response.data.data || null;
+    try {
+      const response = (await axios.get(`api/notes`, {
+        params: { email: auth.user?.email, noteId: searchParams.get("id") },
+        withCredentials: true,
+      })) as axiosResponse;
+      return response.data.data || null;
+    } catch (err) {
+      console.log(err);
+      return;
+    }
   }
 
   const isImageActive = () => {

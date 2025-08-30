@@ -64,6 +64,8 @@ export async function GET(req: NextRequest) {
   try {
     let cookie = req.cookies.get("auth")?.value;
     const searchParams = req.nextUrl.searchParams;
+    const email = searchParams.get("email");
+    const noteId = searchParams.get("noteId");
 
     if (cookie) {
       cookie = await verifyToken(cookie);
@@ -78,7 +80,7 @@ export async function GET(req: NextRequest) {
 
       cookie = JSON.parse(cookie).email;
 
-      if (cookie && searchParams.get("email") === cookie) {
+      if (cookie && email === cookie && noteId) {
         // If cookie can be verified,
         // search for user then create new note
         let [result, field]: [
@@ -88,18 +90,20 @@ export async function GET(req: NextRequest) {
 
         // eslint-disable-next-line
         [result, field] = (await pool.execute(
-          "SELECT data, title FROM notes WHERE accountId = ? ",
-          [(result as RowDataPacket[])[0].accountId]
+          "SELECT data, title FROM notes WHERE noteId = ? ",
+          [noteId]
         )) as [RowDataPacket[], FieldPacket[]];
 
         // Retrieved blob from database ('data' column)
-        const buffer = Buffer.from(result[0].data, "utf8");
+        const buffer = Buffer.from(result[0].data || "", "utf8");
 
         return NextResponse.json(
           {
             status: "Success",
             data: {
-              data: JSON.parse(buffer.toString("utf8")),
+              data:
+                // Check if buffer is empty or no
+                buffer.length > 0 ? JSON.parse(buffer.toString("utf8")) : {},
               title: result[0].title,
             },
             message: "Successfully fetch note data",

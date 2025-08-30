@@ -126,7 +126,6 @@ export function DashboardTable() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  useEffect(() => console.log(data), [data]);
   return (
     <>
       <h1 className="font-bold">Created Notes</h1>

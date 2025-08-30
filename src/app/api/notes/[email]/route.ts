@@ -27,7 +27,6 @@ export async function GET(
           { status: 401 }
         );
       }
-
       const email = JSON.parse(cookie).email;
 
       if (email && emailParam) {
