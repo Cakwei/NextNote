@@ -85,11 +85,13 @@ import {
   Save,
   Undo,
 } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth } from "@/contexts/AuthProvider";
 import { axiosResponse } from "@/types/types";
 import { useSearchParams } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ToolbarProps {
   editor: TipTapEditor | null;
@@ -752,9 +754,9 @@ export const Note = () => {
     enabled: Boolean(auth.user?.email),
     //refetchInterval: false,
   });
+  const navigation = useRouter();
   const [noteTitle, setNoteTitle] = useState("");
   const searchParams = useSearchParams();
-
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,
@@ -859,9 +861,13 @@ export const Note = () => {
         params: { email: auth.user?.email, noteId: searchParams.get("id") },
         withCredentials: true,
       })) as axiosResponse;
+
       return response.data.data || null;
     } catch (err) {
       console.log(err);
+      if ((err as AxiosError).status === 307) {
+        navigation.push("/");
+      }
       return;
     }
   }
@@ -986,7 +992,12 @@ export const Note = () => {
     setNoteTitle(() => value);
   }
 
-  return (
+  // If loading/fetching and still no data
+  return query.isLoading || query.isFetching || !query.data ? (
+    <Skeleton className="w-full h-dvh justify-center flex items-center">
+      Loading Editor...
+    </Skeleton>
+  ) : (
     <div className="flex w-full h-dvh flex-col gap-5">
       <header className="flex items-center justify-between p-4 shadow-md rounded-lg m-0">
         <Input

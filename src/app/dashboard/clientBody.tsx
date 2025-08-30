@@ -24,18 +24,17 @@ import { Colors } from "@/constants/constants";
 import { axiosResponse, INotes, INotesTableArray } from "@/types/types";
 import { Label } from "@radix-ui/react-context-menu";
 import { Plus } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { redirect, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthProvider";
+import { convertTime } from "@/lib/utils";
 
 export function DashboardTable() {
   // const [notes, setNotes] = useState<INotes[]>([]);
   const auth = useAuth();
-  const navigation = useRouter();
   const [showCreateNotesModal, setShowCreateNotesModal] = useState(false);
   const queryClient = useQueryClient();
   const numberOfRows = 3;
@@ -90,8 +89,8 @@ export function DashboardTable() {
               {note.title}
             </Link>
           </TableCell>
-          <TableCell className="">{note.creationDate}</TableCell>
-          <TableCell className="">{note.modifiedDate}</TableCell>
+          <TableCell className="">{convertTime(note.creationDate)}</TableCell>
+          <TableCell className="">{convertTime(note.modifiedDate)}</TableCell>
         </TableRow>
       ));
     }
@@ -99,7 +98,7 @@ export function DashboardTable() {
 
   async function fetchNotesFromDatabase() {
     const response: axiosResponse = await axios.get(
-      "api/notes/charleetan2020@gmail.com", //`api/notes/${auth.user?.email}`
+      `api/notes/${auth.user?.email}`,
       {
         withCredentials: true,
       }

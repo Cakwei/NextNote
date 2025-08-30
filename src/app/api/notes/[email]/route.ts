@@ -27,9 +27,10 @@ export async function GET(
           { status: 401 }
         );
       }
+
       const email = JSON.parse(cookie).email;
 
-      if (email && emailParam) {
+      if (email && emailParam && email === emailParam) {
         const [results]: [RowDataPacket[] | ResultSetHeader, FieldPacket[]] =
           (await pool.execute(
             "SELECT noteId, creationDate, title, data, modifiedDate FROM accounts LEFT JOIN notes ON accounts.accountId = notes.accountId WHERE email = ?",

@@ -2,13 +2,11 @@
 import { apiEndpoint } from "@/constants/constants";
 import { axiosResponse } from "@/types/types";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Logout() {
   const [loading, setLoading] = useState(false);
   const [loggedOut, setLoggedOut] = useState<boolean | null>(null);
-  const navigation = useRouter();
 
   useEffect(() => {
     async function logOut() {
@@ -21,14 +19,14 @@ export default function Logout() {
         if (result.data.status === "Success") {
           setLoggedOut(true);
           setLoading(false);
-          setTimeout(() => navigation.push("/login"), 500);
+          setTimeout(() => (window.location.href = "/"), 500);
         }
       } catch {
         setLoading(false);
       }
     }
     logOut();
-  }, [navigation]);
+  }, []);
 
   return (
     <div className="flex justify-center w-dvw h-dvh items-center">

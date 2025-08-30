@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 21, 2025 at 02:57 PM
+-- Generation Time: Aug 30, 2025 at 12:31 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -35,8 +35,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`accountId`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `password` (`password`)
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -54,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
   `modifiedDate` datetime DEFAULT NULL,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`noteId`),
-  UNIQUE KEY `accountId` (`accountId`)
+  KEY `accountId` (`accountId`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --

@@ -90,26 +90,38 @@ export async function GET(req: NextRequest) {
 
         // eslint-disable-next-line
         [result, field] = (await pool.execute(
-          "SELECT data, title FROM notes WHERE noteId = ? ",
-          [noteId]
+          "SELECT data, title FROM notes LEFT JOIN accounts ON notes.accountId = accounts.accountId WHERE noteId = ? AND accounts.email = ?",
+          [noteId, email]
         )) as [RowDataPacket[], FieldPacket[]];
 
-        // Retrieved blob from database ('data' column)
-        const buffer = Buffer.from(result[0].data || "", "utf8");
+        // If result is found
+        if (result[0]) {
+          // Retrieved blob from database ('data' column)
+          const buffer = Buffer.from(result[0].data || "", "utf8");
 
-        return NextResponse.json(
-          {
-            status: "Success",
-            data: {
-              data:
-                // Check if buffer is empty or no
-                buffer.length > 0 ? JSON.parse(buffer.toString("utf8")) : {},
-              title: result[0].title,
+          return NextResponse.json(
+            {
+              status: "Success",
+              data: {
+                data:
+                  // Check if buffer is empty or no
+                  buffer.length > 0 ? JSON.parse(buffer.toString("utf8")) : {},
+                title: result[0].title,
+              },
+              message: "Successfully fetch note data",
             },
-            message: "Successfully fetch note data",
-          },
-          { status: 201 }
-        );
+            { status: 201 }
+          );
+        } else {
+          return NextResponse.json(
+            {
+              status: "Error",
+              data: {},
+              message: "This note is not made by this account",
+            },
+            { status: 307 }
+          );
+        }
       }
     }
     return NextResponse.json(
