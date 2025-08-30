@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     // If cookie is present
     if (cookie) {
       cookie = await verifyToken(cookie);
-      const email = JSON.parse(cookie || "");
+      const email = cookie ? JSON.parse(cookie) : null;
 
       if (cookie && email) {
         return NextResponse.json(
@@ -29,8 +29,10 @@ export async function POST(req: NextRequest) {
     // If cookie is absent
     if (
       // Check input are string, also check if empty
-      (typeof email !== "string" || typeof password !== "string") &&
-      (!email || !password)
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !email ||
+      !password
     ) {
       return NextResponse.json(
         { status: "Error", data: {}, message: "Invalid request" },

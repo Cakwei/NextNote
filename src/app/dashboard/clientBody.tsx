@@ -27,7 +27,7 @@ import { Plus } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthProvider";
@@ -80,7 +80,13 @@ export function DashboardTable() {
       return (data as INotesTableArray[]).map((note) => (
         <TableRow key={note.title}>
           <TableCell className="">
-            <Link className="hover:underline" href={`note?id=${note.noteId}`}>
+            <Link
+              className="hover:underline"
+              onClick={() => {
+                queryClient.resetQueries({ queryKey: ["note"] });
+              }}
+              href={`note?id=${note.noteId}`}
+            >
               {note.title}
             </Link>
           </TableCell>
@@ -112,10 +118,10 @@ export function DashboardTable() {
           withCredentials: true,
         }
       );
-      if (response.data.status === "Success") {
-        const { noteId } = response.data.data;
-        navigation.push(`/note?=${noteId}`);
-      }
+      //if (response.data.status === "Success") {
+      //const { noteId } = response.data.data;
+      //navigation.push(`/note?=${noteId}`);
+      //}
     } catch (err) {
       console.log(err);
     }

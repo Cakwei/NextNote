@@ -89,7 +89,7 @@ import axios from "axios";
 import { useAuth } from "@/contexts/AuthProvider";
 import { axiosResponse } from "@/types/types";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ToolbarProps {
   editor: TipTapEditor | null;
@@ -750,21 +750,10 @@ export const Note = () => {
     queryKey: ["note"],
     queryFn: fetchNoteData,
     enabled: Boolean(auth.user?.email),
-    refetchInterval: false,
+    //refetchInterval: false,
   });
   const [noteTitle, setNoteTitle] = useState("");
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (query.data?.title) {
-      setNoteTitle(query.data.title as string);
-    }
-
-    // Check if query.data.data exists and is a non-empty object
-    if (query.data?.data && Object.keys(query.data.data).length > 0) {
-      editor?.commands.setContent(query.data.data);
-    }
-  }, [query.data]);
 
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const editor = useEditor({
@@ -844,6 +833,19 @@ export const Note = () => {
       },
     },
   });
+
+  useEffect(() => {
+    if (query.data?.title) {
+      setNoteTitle(query.data.title as string);
+    }
+
+    // Check if query.data.data exists and is a non-empty object
+    if (query.data?.data && Object.keys(query.data.data).length > 0) {
+      editor?.commands.setContent(query.data.data);
+    } else {
+      editor?.commands.clearContent();
+    }
+  }, [query.data, editor]);
 
   const hasSelectedText = () => {
     if (!editor) return false;
