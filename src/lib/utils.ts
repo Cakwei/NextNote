@@ -9,6 +9,10 @@ export function convertTime(date: string) {
   try {
     const UTCDate = new Date(date);
 
+    if (!date) {
+      return;
+    }
+
     if (isNaN(UTCDate.getTime())) {
       return;
     }

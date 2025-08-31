@@ -38,6 +38,8 @@ import {
   Image as LucideImage,
   ListTodo,
   AlignLeft,
+  CloudCheck,
+  RefreshCcw,
 } from "lucide-react";
 import {
   Select,
@@ -96,6 +98,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface ToolbarProps {
   editor: TipTapEditor | null;
   noteTitle: string;
+  isSaving: boolean;
 }
 
 declare module "@tiptap/core" {
@@ -111,7 +114,7 @@ declare module "@tiptap/core" {
     };
   }
 }
-const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle }) => {
+const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle, isSaving }) => {
   const params = useSearchParams();
   const auth = useAuth();
   // eslint-disable-next-line
@@ -231,18 +234,23 @@ const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle }) => {
     }
   };
 
+  /*
   async function saveToDatabase() {
     const noteId = params.get("id");
     const response: axiosResponse = await axios.patch(
       `api/notes/${auth.user?.email}`,
-      { noteData: editor?.getJSON(), noteId: noteId, noteTitle: noteTitle },
+      {
+        noteData: editor?.getJSON(),
+        noteId: noteId,
+        noteTitle: noteTitle || "Untitled Note",
+      },
       { withCredentials: true }
     );
     if (response.data.status === "Success") {
       console.log("Note updated");
     }
   }
-  /*
+  
   const exportJSONFormat = () => {
     const blob = new Blob([JSON.stringify(editor?.getJSON())], {
       type: "application/json",
@@ -255,6 +263,7 @@ const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle }) => {
     URL.revokeObjectURL(url);
   };
   */
+
   const isTableActive = editor.isActive("table");
 
   return (
@@ -611,7 +620,7 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
           </div>
         </DialogContent>
       </Dialog>
-
+      {/* 
       <button
         onClick={saveToDatabase} //{exportJSONFormat}
         className="p-2 rounded-md hover:bg-gray-100"
@@ -635,6 +644,7 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
       >
         <Download size={16} color={"black"} />
       </button>
+      */}
 
       <div className="relative flex gap-2 max-[850px]:justify-start max-[850px]:w-full">
         <Select
@@ -683,6 +693,17 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
             ))}
           </SelectContent>
         </Select>
+        <section className="flex items-center">
+          {isSaving ? (
+            <label className="flex items-center gap-2 text-sm">
+              Syncing... <RefreshCcw size={16} />
+            </label>
+          ) : (
+            <label className="flex items-center gap-2 text-sm">
+              Synced <CloudCheck size={16} />
+            </label>
+          )}
+        </section>
       </div>
     </div>
   );
@@ -762,6 +783,7 @@ export const Note = () => {
   const [isSaving, setIsSaving] = useState(false);
   const params = useSearchParams();
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -863,23 +885,31 @@ export const Note = () => {
     return from !== to;
   };
 
+  async function saveToDatabase() {
+    const noteId = params.get("id");
+
+    const response: axiosResponse = await axios.patch(
+      `api/notes/${auth.user?.email}`,
+      {
+        noteData: editor?.getJSON(),
+        noteId: noteId,
+        noteTitle: noteTitle || "Untitled Note",
+      },
+      { withCredentials: true }
+    );
+    if (response.data.status === "Success") {
+      console.log("Note updated");
+      if (!noteTitle) setNoteTitle("Untitled Note");
+    }
+  }
+
   useEffect(() => {
     if (editorContent === savedContent) {
       return;
     }
 
     setIsSaving(true);
-    async function saveToDatabase() {
-      const noteId = params.get("id");
-      const response: axiosResponse = await axios.patch(
-        `api/notes/${auth.user?.email}`,
-        { noteData: editor?.getJSON(), noteId: noteId, noteTitle: noteTitle },
-        { withCredentials: true }
-      );
-      if (response.data.status === "Success") {
-        console.log("Note updated");
-      }
-    }
+
     const handler = setTimeout(() => {
       console.log("Saving content:", editorContent);
       setSavedContent(editorContent);
@@ -1041,13 +1071,13 @@ export const Note = () => {
           onChange={handleInput}
           name="Title"
           value={noteTitle}
-          placeholder="Untitled Note"
+          placeholder="Note name"
           className="font-bold text-gray-800 border-none outline-none text-xl"
         />
       </header>
       <div className="w-full flex-1 flex flex-col overflow-hidden bg-white rounded-lg shadow-md mb-0.5 ml-0.5">
         <div className="sticky top-0 bg-white">
-          <Toolbar editor={editor} noteTitle={noteTitle} />
+          <Toolbar editor={editor} noteTitle={noteTitle} isSaving={isSaving} />
         </div>
         {/* Modified this div to handle overflow-y-auto */}
         <div

@@ -117,7 +117,6 @@ export function DashboardTable() {
           withCredentials: true,
         }
       );
-      
     } catch (err) {
       console.log(err);
     }

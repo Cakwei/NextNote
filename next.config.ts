@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
+  compiler: {
+    removeConsole: true,
+  },
 };
 
 export default nextConfig;
