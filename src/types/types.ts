@@ -4,7 +4,7 @@ import { LucideIcon } from "lucide-react";
 export interface axiosResponse extends AxiosResponse {
   data: {
     status: string;
-    data: { [key: string]: string | string[] | INotesTableArray[]};
+    data: { [key: string]: string | string[] | INotesTableArray[] };
     message: string;
   };
 }
@@ -32,4 +32,9 @@ export type INotesTableArray = {
   data: string;
   creationDate: string;
   modifiedDate: string;
+};
+
+export type JSONContent = {
+  type: string;
+  content?: JSONContent[];
 };

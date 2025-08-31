@@ -67,7 +67,7 @@ import { Button } from "@/components/ui/button";
 import "./style/editor.css";
 import { fontFamilies, fontSizes } from "@/constants/constants";
 import { Separator } from "@/components/ui/separator";
-import { Extension } from "@tiptap/core";
+import { Extension, JSONContent } from "@tiptap/core";
 import { TextSelection } from "prosemirror-state";
 import {
   AlignCenter,
@@ -757,6 +757,10 @@ export const Note = () => {
   const navigation = useRouter();
   const [noteTitle, setNoteTitle] = useState("");
   const searchParams = useSearchParams();
+  const [editorContent, setEditorContent] = useState<JSONContent | null>(null);
+  const [savedContent, setSavedContent] = useState<JSONContent | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const params = useSearchParams();
   const [hasClipboardContent, setHasClipboardContent] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,
@@ -785,6 +789,10 @@ export const Note = () => {
       CellSelectKeymap,
       CellSelection,
     ],
+    onUpdate: ({ editor }) => {
+      const JSONContent = editor.getJSON();
+      setEditorContent(JSONContent as JSONContent);
+    },
     editorProps: {
       attributes: {
         class:
@@ -855,6 +863,35 @@ export const Note = () => {
     return from !== to;
   };
 
+  useEffect(() => {
+    if (editorContent === savedContent) {
+      return;
+    }
+
+    setIsSaving(true);
+    async function saveToDatabase() {
+      const noteId = params.get("id");
+      const response: axiosResponse = await axios.patch(
+        `api/notes/${auth.user?.email}`,
+        { noteData: editor?.getJSON(), noteId: noteId, noteTitle: noteTitle },
+        { withCredentials: true }
+      );
+      if (response.data.status === "Success") {
+        console.log("Note updated");
+      }
+    }
+    const handler = setTimeout(() => {
+      console.log("Saving content:", editorContent);
+      setSavedContent(editorContent);
+      saveToDatabase();
+      setIsSaving(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [editorContent, savedContent]);
+
   async function fetchNoteData() {
     try {
       const response = (await axios.get(`api/notes`, {
@@ -901,7 +938,7 @@ export const Note = () => {
     const { state, chain } = editor;
     const { selection, doc } = state;
     if (action === "copy" || action === "cut") {
-      // First, check if the entire table is selected.
+      // First check if the entire table is selected.
       const maybeTable = doc.nodeAt(selection.from);
       const isTableSelection =
         maybeTable &&
@@ -936,7 +973,7 @@ export const Note = () => {
         return;
       }
 
-      // Next, check if a single image is selected (not part of a larger selection).
+      // Next check if a single image is selected (not part of a larger selection).
       if (editor.isActive("image")) {
         const node = selection.content().content.maybeChild(0);
         if (node && node.type.name === "image") {

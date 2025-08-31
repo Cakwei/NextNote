@@ -117,10 +117,7 @@ export function DashboardTable() {
           withCredentials: true,
         }
       );
-      //if (response.data.status === "Success") {
-      //const { noteId } = response.data.data;
-      //navigation.push(`/note?=${noteId}`);
-      //}
+      
     } catch (err) {
       console.log(err);
     }
