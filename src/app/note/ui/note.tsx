@@ -27,6 +27,7 @@ import CodeBlock from "@tiptap/extension-code-block";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { findParentNodeOfType } from "prosemirror-utils";
 import { BulletList, ListItem } from "@tiptap/extension-list";
+import { Image } from "@tiptap/extension-image";
 import {
   Bold as BoldIcon,
   Italic,
@@ -114,6 +115,7 @@ declare module "@tiptap/core" {
     };
   }
 }
+
 const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle, isSaving }) => {
   const params = useSearchParams();
   const auth = useAuth();
@@ -192,18 +194,24 @@ const Toolbar: FC<ToolbarProps> = ({ editor, noteTitle, isSaving }) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
+
       reader.onload = (e) => {
         if (e.target?.result) {
-          editor
-            .chain()
-            .focus()
-            .setImage({ src: e.target.result as string })
-            .run();
+          setTimeout(() => {
+            editor
+              .chain()
+              .focus()
+              .setImage({ src: e.target?.result as string })
+              .run();
+          }, 0);
         }
       };
+
       reader.readAsDataURL(file);
+      event.target.value = "";
     }
   };
+
   const openLinkModal = () => {
     const currentLink = editor.getAttributes("link").href;
     setLinkUrl(currentLink || "");
@@ -335,7 +343,9 @@ ${buttonStates.underline ? "bg-gray-200" : "hover:bg-gray-100"}`}
         accept="image/*"
         ref={fileInputRef}
         onChange={handleImageUpload}
-        style={{ display: "none" }}
+        capture="environment"
+        className="sr-only"
+        // style={{ display: "none" }}
       />
       <button
         onClick={() => fileInputRef.current?.click()}
@@ -787,6 +797,7 @@ export const Note = () => {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
+      Image,
       StarterKit,
       Bold,
       Blockquote,

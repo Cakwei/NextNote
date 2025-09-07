@@ -118,6 +118,7 @@ export async function PATCH(
     );
   } catch (err) {
     console.log(err);
+    console.log('cwfwefgwe')
     return NextResponse.json(
       { status: "Error", data: "", message: "Failed to update note" },
       { status: 500 }

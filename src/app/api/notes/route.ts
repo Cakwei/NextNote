@@ -105,12 +105,12 @@ export async function GET(req: NextRequest) {
               data: {
                 data:
                   // Check if buffer is empty or no
-                  buffer.length > 0 ? JSON.parse(buffer.toString("utf8")) : {},
+                  safeParseBuffer(buffer),
                 title: result[0].title,
               },
               message: "Successfully fetch note data",
             },
-            { status: 201 }
+            { status: 200 }
           );
         } else {
           return NextResponse.json(
@@ -135,8 +135,24 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.log(err);
     return NextResponse.json(
-      { status: "Error", data: {}, message: "Error creating note" },
+      { status: "Error", data: {}, message: "Error fetching note" },
       { status: 500 }
     );
   }
+}
+
+function safeParseBuffer(buffer: Buffer) {
+  // Check if the buffer has content before attempting to parse.
+  if (buffer.length > 0) {
+    try {
+      // Attempt to parse the buffer as a UTF-8 string.
+      console.log(JSON.parse(buffer.toString("utf8")));
+      return JSON.parse(buffer.toString("utf8"));
+    } catch (e) {
+      // If an error occurs during parsing, log the error and return null.
+      console.error("Error parsing JSON:", e);
+      return null;
+    }
+  }
+  return null;
 }
